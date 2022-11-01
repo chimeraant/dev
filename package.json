@@ -1,26 +1,22 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
-  "private": true,
-  "description": "TypeScript template action",
+  "name": "@chimeraant/dev",
+  "version": "0.0.0-semantic-release",
+  "description": "Chimera Ant's development environment",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
-    "format": "prettier --write '**/*.ts'",
-    "format-check": "prettier --check '**/*.ts'",
-    "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "build": "tsc && NODE_OPTIONS=--openssl-legacy-provider ncc build --source-map --license licenses.txt",
+    "fix": "eslint --max-warnings=0 --ext .ts . --fix",
+    "lint": "eslint --max-warnings=0 --ext .ts .",
+    "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
+    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint",
+    "node-version": "node --version"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
-  },
+  "repository": "https://github.com/chimeraant/dev",
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "nix",
+    "flake",
+    "direnv"
   ],
   "author": "",
   "license": "MIT",
@@ -28,16 +24,22 @@
     "@actions/core": "^1.10.0"
   },
   "devDependencies": {
-    "@types/node": "^18.11.0",
-    "@typescript-eslint/parser": "^4.33.0",
     "@vercel/ncc": "^0.31.1",
-    "eslint": "^7.32.0",
-    "eslint-plugin-github": "^4.3.2",
-    "eslint-plugin-jest": "^25.3.2",
-    "jest": "^27.2.5",
+    "eslint": "^8.25.0",
     "js-yaml": "^4.1.0",
-    "prettier": "2.5.1",
-    "ts-jest": "^27.1.2",
-    "typescript": "^4.4.4"
-  }
+    "nazna": "^1.13.19",
+    "pnpm": "^7.13.4",
+    "semantic-release": "^19.0.5",
+    "typescript": "^4.8.4"
+  },
+  "types": "./dist/types/index.d.ts",
+  "module": "./dist/es6/index.js",
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/es6/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": "./dist/cli.js"
 }
