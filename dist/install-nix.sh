@@ -22,3 +22,5 @@ export INPUT_INSTALL_OPTIONS=""
 export INPUT_NIX_PATH=""
 export INPUT_EXTRA_NIX_CONFIG=""
 bash "$workdir/install"
+
+bash ./install-direnv.sh

@@ -24,7 +24,7 @@ const run = async () => {
 
     core.saveState(c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`)
     core.saveState(c.nixStoreKeyStateKey, nixStoreKey)
-    await exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+    await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
       env: {...process.env, NIX_VERSION: c.nixVersion, DIRENV_VERSION: c.direnvVersion}
     })
   } catch (error) {

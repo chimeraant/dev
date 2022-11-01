@@ -68,7 +68,7 @@ const run = async () => {
         // }
         core.saveState(constants_1.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
         core.saveState(constants_1.c.nixStoreKeyStateKey, nixStoreKey);
-        await exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+        await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
             env: { ...process.env, NIX_VERSION: constants_1.c.nixVersion, DIRENV_VERSION: constants_1.c.direnvVersion }
         });
     }
