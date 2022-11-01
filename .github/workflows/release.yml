@@ -39,11 +39,6 @@ jobs:
         with:
           nix_store_key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
 
-
-      - run: direnv allow
-
-      - run: direnv export gha >> "$GITHUB_ENV"
-
       - run: nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache
 
       - run: playwright pdf google.com a.pdf
