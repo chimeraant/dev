@@ -44,6 +44,8 @@ jobs:
 
       - run: direnv export gha >> "$GITHUB_ENV"
 
+      - run: nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache
+
       - run: playwright pdf google.com a.pdf
 
   check-dist:
