@@ -7,12 +7,11 @@ import {c} from './constants'
 
 const prepareNix = async () => {
   const nixStoreKey = core.getInput('nix_store_key', {required: true})
-  const [nixCache] = await Promise.all([
-    cache.restoreCache([c.nixCachePath], nixStoreKey),
-    exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
-      env: {NIX_VERSION: c.nixVersion}
-    })
-  ])
+  await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
+    env: {NIX_VERSION: c.nixVersion}
+  })
+
+  const [nixCache] = await Promise.all([cache.restoreCache([c.nixCachePath], nixStoreKey)])
   const isNixStoreCacheHit = nixCache !== undefined
   if (isNixStoreCacheHit) {
     await exec.exec('nix-store --import < /tmp/nixcache')
@@ -24,10 +23,10 @@ const prepareNix = async () => {
 const run = async () => {
   try {
     await Promise.all([
-      prepareNix(),
-      exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
-        env: {DIRENV_VERSION: c.direnvVersion}
-      })
+      prepareNix()
+      // exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+      //   env: {DIRENV_VERSION: c.direnvVersion}
+      // })
     ])
     await exec.exec('direnv allow')
     await exec.exec('direnv export gha >> "$GIHUB_ENV')
