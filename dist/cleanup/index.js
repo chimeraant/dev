@@ -33,13 +33,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const exec = __importStar(__nccwpck_require__(1062));
-const main_1 = __nccwpck_require__(3248);
+const constants_1 = __nccwpck_require__(9349);
 const run = async () => {
     try {
-        if (core.getState(main_1.c.isNixStoreCacheHitStateKey) !== 'true') {
+        if (core.getState(constants_1.c.isNixStoreCacheHitStateKey) !== 'true') {
             await exec.exec('nix-store --optimize');
             await exec.exec("nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache");
-            await cache.saveCache([main_1.c.nixCachePath], main_1.c.nixStoreKeyStateKey);
+            await cache.saveCache([constants_1.c.nixCachePath], constants_1.c.nixStoreKeyStateKey);
         }
     }
     catch (error) {
@@ -53,40 +53,13 @@ run();
 
 /***/ }),
 
-/***/ 3248:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 9349:
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.c = void 0;
-const cache = __importStar(__nccwpck_require__(6110));
-const core = __importStar(__nccwpck_require__(7535));
-const exec = __importStar(__nccwpck_require__(1062));
-const path = __importStar(__nccwpck_require__(5622));
 exports.c = {
     nixCachePath: '/tmp/nixcache',
     nixVersion: '2.11.0',
@@ -95,40 +68,7 @@ exports.c = {
     isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
     nixStoreKeyStateKey: 'nixStoreKey'
 };
-const prepareNix = async () => {
-    const nixStoreKey = core.getInput('nix_store_key', { required: true });
-    const [nixCache] = await Promise.all([
-        cache.restoreCache([exports.c.nixCachePath], nixStoreKey),
-        exec.exec(`curl -sfL ${exports.c.nixInstallScriptUrl} | bash`, [], {
-            env: { INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${exports.c.nixVersion}/install` }
-        })
-    ]);
-    const isNixStoreCacheHit = nixCache !== undefined;
-    if (isNixStoreCacheHit) {
-        await exec.exec('nix-store --import < /tmp/nixcache');
-    }
-    core.saveState(exports.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
-    core.saveState(exports.c.nixStoreKeyStateKey, nixStoreKey);
-};
-const run = async () => {
-    try {
-        await Promise.all([
-            prepareNix(),
-            exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
-                env: { DIRENV_VERSION: exports.c.direnvVersion }
-            })
-        ]);
-        await exec.exec('direnv allow');
-        await exec.exec('direnv export gha >> "$GIHUB_ENV');
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            core.setFailed(error.message);
-        }
-    }
-};
-run();
-//# sourceMappingURL=main.js.map
+//# sourceMappingURL=constants.js.map
 
 /***/ }),
 

@@ -2,7 +2,7 @@ import * as cache from '@actions/cache'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 
-import {c} from './main'
+import {c} from './constants'
 
 const run = async () => {
   try {

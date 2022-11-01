@@ -1,6 +1,25 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 9349:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.c = void 0;
+exports.c = {
+    nixCachePath: '/tmp/nixcache',
+    nixVersion: '2.11.0',
+    direnvVersion: '2.32.1',
+    nixInstallScriptUrl: 'https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh',
+    isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
+    nixStoreKeyStateKey: 'nixStoreKey'
+};
+//# sourceMappingURL=constants.js.map
+
+/***/ }),
+
 /***/ 3248:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -30,40 +49,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.c = void 0;
 const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const exec = __importStar(__nccwpck_require__(1062));
 const path = __importStar(__nccwpck_require__(5622));
-exports.c = {
-    nixCachePath: '/tmp/nixcache',
-    nixVersion: '2.11.0',
-    direnvVersion: '2.32.1',
-    nixInstallScriptUrl: 'https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh',
-    isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
-    nixStoreKeyStateKey: 'nixStoreKey'
-};
+const constants_1 = __nccwpck_require__(9349);
 const prepareNix = async () => {
     const nixStoreKey = core.getInput('nix_store_key', { required: true });
     const [nixCache] = await Promise.all([
-        cache.restoreCache([exports.c.nixCachePath], nixStoreKey),
-        exec.exec(`curl -sfL ${exports.c.nixInstallScriptUrl} | bash`, [], {
-            env: { INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${exports.c.nixVersion}/install` }
+        cache.restoreCache([constants_1.c.nixCachePath], nixStoreKey),
+        exec.exec(`curl -sfL ${constants_1.c.nixInstallScriptUrl} | bash`, [], {
+            env: { INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${constants_1.c.nixVersion}/install` }
         })
     ]);
     const isNixStoreCacheHit = nixCache !== undefined;
     if (isNixStoreCacheHit) {
         await exec.exec('nix-store --import < /tmp/nixcache');
     }
-    core.saveState(exports.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
-    core.saveState(exports.c.nixStoreKeyStateKey, nixStoreKey);
+    core.saveState(constants_1.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
+    core.saveState(constants_1.c.nixStoreKeyStateKey, nixStoreKey);
 };
 const run = async () => {
     try {
         await Promise.all([
             prepareNix(),
             exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
-                env: { DIRENV_VERSION: exports.c.direnvVersion }
+                env: { DIRENV_VERSION: constants_1.c.direnvVersion }
             })
         ]);
         await exec.exec('direnv allow');
