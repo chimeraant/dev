@@ -35,8 +35,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-        with:
-          milliseconds: 1000
 
   check-dist:
     runs-on: ubuntu-latest
@@ -60,7 +58,7 @@ jobs:
         run: pnpm install
 
       - name: Rebuild the dist/ directory
-        run: pnpm build
+        run: pnpm build:ci
 
       - name: Compare the expected and actual dist/ directories
         run: |
