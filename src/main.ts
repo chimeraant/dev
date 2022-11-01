@@ -23,10 +23,10 @@ const prepareNix = async () => {
 const run = async () => {
   try {
     await Promise.all([
-      prepareNix()
-      // exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
-      //   env: {DIRENV_VERSION: c.direnvVersion}
-      // })
+      prepareNix(),
+      exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+        env: {DIRENV_VERSION: c.direnvVersion}
+      })
     ])
     await exec.exec('direnv allow')
     await exec.exec('direnv export gha >> "$GIHUB_ENV')
