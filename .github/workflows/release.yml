@@ -39,6 +39,10 @@ jobs:
         with:
           nix_store_key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
 
+      - run: direnv allow
+
+      - run: direnv export gha >> "$GITHUB_ENV"
+
       - run: playwright pdf google.com a.pdf
 
   check-dist:
