@@ -26,7 +26,7 @@ const run = async () => {
     await Promise.all([
       prepareNix(),
       exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
-        env: {NIX_VERSION: c.direnvVersion}
+        env: {DIRENV_VERSION: c.direnvVersion}
       })
     ])
     await exec.exec('direnv allow')
