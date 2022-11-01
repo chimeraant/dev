@@ -1,11 +1,6 @@
 import * as cache from '@actions/cache'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import {ExecOptions} from '@actions/exec'
-import * as path from 'path'
-
-const execLocal = (script: string, opt?: ExecOptions) =>
-  exec.exec(path.join(path.dirname(__filename), script), [], opt)
 
 export const c = {
   nixCachePath: '/tmp/nixcache',
@@ -21,7 +16,7 @@ const prepareNix = async () => {
   const nixStoreKey = core.getInput('nix_store_key', {required: true})
   const [nixCache] = await Promise.all([
     cache.restoreCache([c.nixCachePath], nixStoreKey),
-    exec.exec(c.nixInstallScriptUrl, [], {
+    exec.exec(`curl -sfL ${c.nixInstallScriptUrl} | bash`, [], {
       env: {INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${c.nixVersion}/install`}
     })
   ])
@@ -37,7 +32,7 @@ const run = async () => {
   try {
     await Promise.all([
       prepareNix(),
-      execLocal('install-direnv.sh', {env: {DIRENV_VERSION: c.direnvVersion}})
+      exec.exec('install-direnv.sh', [], {env: {DIRENV_VERSION: c.direnvVersion}})
     ])
     await exec.exec('direnv allow')
     await exec.exec('direnv export gha >> "$GIHUB_ENV')

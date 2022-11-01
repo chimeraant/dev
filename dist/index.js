@@ -34,8 +34,6 @@ exports.c = void 0;
 const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const exec = __importStar(__nccwpck_require__(1062));
-const path = __importStar(__nccwpck_require__(5622));
-const execLocal = (script, opt) => exec.exec(path.join(path.dirname(__filename), script), [], opt);
 exports.c = {
     nixCachePath: '/tmp/nixcache',
     nixVersion: '2.11.0',
@@ -48,7 +46,7 @@ const prepareNix = async () => {
     const nixStoreKey = core.getInput('nix_store_key', { required: true });
     const [nixCache] = await Promise.all([
         cache.restoreCache([exports.c.nixCachePath], nixStoreKey),
-        exec.exec(exports.c.nixInstallScriptUrl, [], {
+        exec.exec(`curl -sfL ${exports.c.nixInstallScriptUrl} | bash`, [], {
             env: { INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${exports.c.nixVersion}/install` }
         })
     ]);
@@ -63,7 +61,7 @@ const run = async () => {
     try {
         await Promise.all([
             prepareNix(),
-            execLocal('install-direnv.sh', { env: { DIRENV_VERSION: exports.c.direnvVersion } })
+            exec.exec('install-direnv.sh', [], { env: { DIRENV_VERSION: exports.c.direnvVersion } })
         ]);
         await exec.exec('direnv allow');
         await exec.exec('direnv export gha >> "$GIHUB_ENV');
