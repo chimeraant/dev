@@ -17,4 +17,8 @@ do
   fi
 done
 
-INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install" bash "$workdir/install"
+export INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install" 
+export INPUT_INSTALL_OPTIONS=""
+export INPUT_NIX_PATH=""
+export INPUT_EXTRA_NIX_CONFIG=""
+sh "$workdir/install"
