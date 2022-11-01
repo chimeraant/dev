@@ -79,7 +79,7 @@ jobs:
           path: dist/
 
   release:
-    needs: [lint test check-dist]
+    needs: [lint, test, check-dist]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
