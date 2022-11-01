@@ -6,9 +6,8 @@ set -euo pipefail
   # Create a temporary workdir
   workdir=$(mktemp -d)
   trap 'rm -rf "$workdir"' EXIT
-# stripped version of https://direnv.net/install.sh
-  curl -o "/usr/local/bin/direnv" -fL "https://github.com/direnv/direnv/releases/download/v${DIRENV_VERSION}/direnv.linux-amd64"
-  chmod +x "/usr/local/bin/direnv"
+
+  INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install"
 
   curl_retries=5
   while ! curl -sS -o "$workdir/install" -v --fail -L "${INPUT_INSTALL_URL:-https://nixos.org/nix/install}"
@@ -21,5 +20,5 @@ set -euo pipefail
     fi
   done
 
-  INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install"sh "$workdir/install"
+  sh "$workdir/install"
 }
