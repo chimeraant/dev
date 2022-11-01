@@ -79,8 +79,8 @@ const run = async () => {
                 env: { DIRENV_VERSION: constants_1.c.direnvVersion }
             })
         ]);
-        await exec.exec('direnv allow');
-        await exec.exec('direnv export gha >> "$GIHUB_ENV');
+        // await exec.exec('direnv allow')
+        // await exec.exec('direnv export gha >> "$GIHUB_ENV')
         core.saveState(constants_1.c.isSuccessStateKey, `${true}`);
     }
     catch (error) {
