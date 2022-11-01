@@ -1,9 +1,13 @@
 name: 'Chimera Ant Development Environment'
 description: "Chimera Ant's development environment"
 author: 'Chimera Ant'
+inputs:
+  nix_store_key:
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
+  post: 'dist/cleanup.js'
 branding:
   icon: 'briefcase'
   color: 'green'
