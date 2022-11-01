@@ -66,7 +66,7 @@ const prepareNix = async () => {
     if (isNixStoreCacheHit) {
         core.info(`cache hit! key : ${nixStoreKey}`);
         core.info(`cache hit! value : ${nixCache}`);
-        await exec.exec('nix-store --import < /tmp/nixcache');
+        await exec.exec(`nix-store --import < ${constants_1.c.nixCachePath}`);
     }
     core.saveState(constants_1.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
     core.saveState(constants_1.c.nixStoreKeyStateKey, nixStoreKey);
