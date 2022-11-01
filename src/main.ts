@@ -8,7 +8,7 @@ import {c} from './constants'
 const prepareNix = async () => {
   const nixStoreKey = core.getInput('nix_store_key', {required: true})
   await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
-    env: {NIX_VERSION: c.nixVersion}
+    env: {...process.env, NIX_VERSION: c.nixVersion}
   })
 
   const [nixCache] = await Promise.all([cache.restoreCache([c.nixCachePath], nixStoreKey)])

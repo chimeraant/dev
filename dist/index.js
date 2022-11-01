@@ -58,7 +58,7 @@ const constants_1 = __nccwpck_require__(9349);
 const prepareNix = async () => {
     const nixStoreKey = core.getInput('nix_store_key', { required: true });
     await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
-        env: { NIX_VERSION: constants_1.c.nixVersion }
+        env: { ...process.env, NIX_VERSION: constants_1.c.nixVersion }
     });
     const [nixCache] = await Promise.all([cache.restoreCache([constants_1.c.nixCachePath], nixStoreKey)]);
     const isNixStoreCacheHit = nixCache !== undefined;
