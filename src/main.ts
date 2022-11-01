@@ -1,4 +1,3 @@
-import * as cache from '@actions/cache'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as path from 'path'
@@ -9,12 +8,13 @@ const run = async () => {
   try {
     const nixStoreKey = core.getInput('nix_store_key', {required: true})
 
-    const [nixCache] = await Promise.all([cache.restoreCache([c.nixCachePath], nixStoreKey)])
-    const isNixStoreCacheHit = nixCache !== undefined
+    // const [nixCache] = await Promise.all([cache.restoreCache([c.nixCachePath], nixStoreKey)])
+    // const isNixStoreCacheHit = nixCache !== undefined
+    const isNixStoreCacheHit = false
 
-    await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
-      env: {...process.env, NIX_VERSION: c.nixVersion}
-    })
+    // await exec.exec(path.join(path.dirname(__filename), 'install-nix.sh'), [], {
+    //   env: {...process.env, NIX_VERSION: c.nixVersion}
+    // })
 
     // if (isNixStoreCacheHit) {
     //   core.info(`cache hit! key : ${nixStoreKey}`)
