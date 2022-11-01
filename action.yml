@@ -7,7 +7,7 @@ inputs:
 runs:
   using: 'node16'
   main: 'dist/index.js'
-  post: 'dist/cleanup.js'
+  post: 'dist/cleanup/index.js'
 branding:
   icon: 'briefcase'
   color: 'green'
