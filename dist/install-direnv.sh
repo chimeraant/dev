@@ -25,13 +25,10 @@ export INPUT_NIX_PATH=""
 export INPUT_EXTRA_NIX_CONFIG=""
 bash "$workdir/install"
 
-.
 source .
 
 curl -o "/usr/local/bin/direnv" -fL "https://github.com/direnv/direnv/releases/download/v${DIRENV_VERSION}/direnv.linux-amd64"
 chmod +x "/usr/local/bin/direnv"
-
-.
 
 source .
 
