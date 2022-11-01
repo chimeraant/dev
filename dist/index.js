@@ -79,8 +79,7 @@ const run = async () => {
                 env: { DIRENV_VERSION: constants_1.c.direnvVersion }
             })
         ]);
-        await exec.exec('direnv allow');
-        await exec.exec('direnv export gha >> "$GIHUB_ENV');
+        await exec.exec(path.join(path.dirname(__filename), 'direnv-allow.sh'));
     }
     catch (error) {
         if (error instanceof Error) {
