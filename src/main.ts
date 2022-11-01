@@ -32,7 +32,6 @@ const run = async () => {
         env: {DIRENV_VERSION: c.direnvVersion}
       })
     ])
-    await exec.exec(path.join(path.dirname(__filename), 'direnv-allow.sh'))
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)

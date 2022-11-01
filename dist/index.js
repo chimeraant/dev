@@ -78,7 +78,6 @@ const run = async () => {
                 env: { DIRENV_VERSION: constants_1.c.direnvVersion }
             })
         ]);
-        await exec.exec(path.join(path.dirname(__filename), 'direnv-allow.sh'));
     }
     catch (error) {
         if (error instanceof Error) {
