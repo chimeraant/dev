@@ -31,6 +31,7 @@ const run = async () => {
     ])
     await exec.exec('direnv allow')
     await exec.exec('direnv export gha >> "$GIHUB_ENV')
+    core.saveState(c.isSuccessStateKey, `${true}`)
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)

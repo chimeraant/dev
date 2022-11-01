@@ -36,10 +36,11 @@ const exec = __importStar(__nccwpck_require__(1062));
 const constants_1 = __nccwpck_require__(9349);
 const run = async () => {
     try {
-        if (core.getState(constants_1.c.isNixStoreCacheHitStateKey) !== 'true') {
+        if (core.getState(constants_1.c.isSuccessStateKey) === 'true' &&
+            core.getState(constants_1.c.isNixStoreCacheHitStateKey) !== 'true') {
             await exec.exec('nix-store --optimize');
             await exec.exec("nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache");
-            await cache.saveCache([constants_1.c.nixCachePath], constants_1.c.nixStoreKeyStateKey);
+            await cache.saveCache([constants_1.c.nixCachePath], core.getState(constants_1.c.nixStoreKeyStateKey));
         }
     }
     catch (error) {
@@ -66,7 +67,8 @@ exports.c = {
     direnvVersion: '2.32.1',
     nixInstallScriptUrl: 'https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh',
     isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
-    nixStoreKeyStateKey: 'nixStoreKey'
+    nixStoreKeyStateKey: 'nixStoreKey',
+    isSuccessStateKey: 'isSuccess'
 };
 //# sourceMappingURL=constants.js.map
 

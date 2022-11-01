@@ -6,12 +6,15 @@ import {c} from './constants'
 
 const run = async () => {
   try {
-    if (core.getState(c.isNixStoreCacheHitStateKey) !== 'true') {
+    if (
+      core.getState(c.isSuccessStateKey) === 'true' &&
+      core.getState(c.isNixStoreCacheHitStateKey) !== 'true'
+    ) {
       await exec.exec('nix-store --optimize')
       await exec.exec(
         "nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nixcache"
       )
-      await cache.saveCache([c.nixCachePath], c.nixStoreKeyStateKey)
+      await cache.saveCache([c.nixCachePath], core.getState(c.nixStoreKeyStateKey))
     }
   } catch (error) {
     if (error instanceof Error) {
