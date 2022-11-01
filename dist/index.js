@@ -59,22 +59,10 @@ const prepareNix = async () => {
     const nixStoreKey = core.getInput('nix_store_key', { required: true });
     const [nixCache] = await Promise.all([
         cache.restoreCache([constants_1.c.nixCachePath], nixStoreKey),
-        exec.exec(`#!/usr/bin/env bash
-
-workdir=$(mktemp -d)
-trap 'rm -rf "$workdir"' EXIT
-while ! curl -sS -o "$workdir/install" -v --fail -L "${constants_1.c.nixInstallScriptUrl}"
-do
-  sleep 1
-  ((curl_retries--))
-  if [[ $curl_retries -le 0 ]]; then
-    echo "curl retries failed" >&2
-    exit 1
-  fi
-done
-`, [], {
+        path.join(path.dirname(__filename), 'install-direnv.sh'),
+        exec.exec(`curl -sS -o "./install" -v --fail -L "${constants_1.c.nixInstallScriptUrl}" `).then(() => exec.exec(`./install`, [], {
             env: { INPUT_INSTALL_URL: `https://releases.nixos.org/nix/nix-${constants_1.c.nixVersion}/install` }
-        })
+        }))
     ]);
     const isNixStoreCacheHit = nixCache !== undefined;
     if (isNixStoreCacheHit) {
