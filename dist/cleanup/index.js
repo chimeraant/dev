@@ -39,8 +39,9 @@ const run = async () => {
         core.info(`cache hit? :${core.getState(constants_1.c.isNixStoreCacheHitStateKey)}`);
         if (core.getState(constants_1.c.isNixStoreCacheHitStateKey) !== 'true') {
             await exec.exec('nix-store --optimize');
-            await exec.exec(`ls /nix/store`);
             await exec.exec(`find /nix/store`);
+            await exec.exec(`find /nix/store -name '*-*'`);
+            await exec.exec(`find /nix/store -maxdepth 1`);
             await exec.exec(`find /nix/store -maxdepth 1 -name '*-*'`);
             await exec.exec(`nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > ${constants_1.c.nixCachePath}`);
             await cache.saveCache([constants_1.c.nixCachePath], core.getState(constants_1.c.nixStoreKeyStateKey));
