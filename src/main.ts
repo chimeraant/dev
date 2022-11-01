@@ -16,7 +16,8 @@ const prepareNix = async () => {
   ])
   const isNixStoreCacheHit = nixCache !== undefined
   if (isNixStoreCacheHit) {
-    core.info(`cache hit : ${nixCache}`)
+    core.info(`cache hit! key : ${nixStoreKey}`)
+    core.info(`cache hit! value : ${nixCache}`)
     await exec.exec('nix-store --import < /tmp/nixcache')
   }
   core.saveState(c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`)
@@ -31,9 +32,8 @@ const run = async () => {
         env: {DIRENV_VERSION: c.direnvVersion}
       })
     ])
-    // await exec.exec('direnv allow')
-    // await exec.exec('direnv export gha >> "$GIHUB_ENV')
-    core.saveState(c.isSuccessStateKey, `${true}`)
+    await exec.exec('direnv allow')
+    await exec.exec('direnv export gha >> "$GIHUB_ENV')
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)

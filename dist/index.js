@@ -14,8 +14,7 @@ exports.c = {
     direnvVersion: '2.32.1',
     nixInstallScriptUrl: 'https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh',
     isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
-    nixStoreKeyStateKey: 'nixStoreKey',
-    isSuccessStateKey: 'isSuccess'
+    nixStoreKeyStateKey: 'nixStoreKey'
 };
 //# sourceMappingURL=constants.js.map
 
@@ -65,7 +64,8 @@ const prepareNix = async () => {
     ]);
     const isNixStoreCacheHit = nixCache !== undefined;
     if (isNixStoreCacheHit) {
-        core.info(`cache hit : ${nixCache}`);
+        core.info(`cache hit! key : ${nixStoreKey}`);
+        core.info(`cache hit! value : ${nixCache}`);
         await exec.exec('nix-store --import < /tmp/nixcache');
     }
     core.saveState(constants_1.c.isNixStoreCacheHitStateKey, `${isNixStoreCacheHit}`);
@@ -79,9 +79,8 @@ const run = async () => {
                 env: { DIRENV_VERSION: constants_1.c.direnvVersion }
             })
         ]);
-        // await exec.exec('direnv allow')
-        // await exec.exec('direnv export gha >> "$GIHUB_ENV')
-        core.saveState(constants_1.c.isSuccessStateKey, `${true}`);
+        await exec.exec('direnv allow');
+        await exec.exec('direnv export gha >> "$GIHUB_ENV');
     }
     catch (error) {
         if (error instanceof Error) {

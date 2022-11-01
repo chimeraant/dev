@@ -5,6 +5,5 @@ export const c = {
   nixInstallScriptUrl:
     'https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh',
   isNixStoreCacheHitStateKey: 'isNixStoreCacheHit',
-  nixStoreKeyStateKey: 'nixStoreKey',
-  isSuccessStateKey: 'isSuccess'
+  nixStoreKeyStateKey: 'nixStoreKey'
 }
