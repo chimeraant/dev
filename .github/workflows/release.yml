@@ -34,7 +34,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: ./
+        with:
+          nix_store_key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+
+      - run: playwright pdf google.com a.pdf
 
   check-dist:
     runs-on: ubuntu-latest
