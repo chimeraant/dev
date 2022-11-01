@@ -1,4 +1,4 @@
-name: 'build-test'
+name: 'build-test-release'
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
@@ -79,6 +79,7 @@ jobs:
           path: dist/
 
   release:
+    needs: [lint test check-dist]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
