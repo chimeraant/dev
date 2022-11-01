@@ -86,6 +86,7 @@ exports.c = void 0;
 const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const exec = __importStar(__nccwpck_require__(1062));
+const path = __importStar(__nccwpck_require__(5622));
 exports.c = {
     nixCachePath: '/tmp/nixcache',
     nixVersion: '2.11.0',
@@ -113,7 +114,9 @@ const run = async () => {
     try {
         await Promise.all([
             prepareNix(),
-            exec.exec('install-direnv.sh', [], { env: { DIRENV_VERSION: exports.c.direnvVersion } })
+            exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+                env: { DIRENV_VERSION: exports.c.direnvVersion }
+            })
         ]);
         await exec.exec('direnv allow');
         await exec.exec('direnv export gha >> "$GIHUB_ENV');

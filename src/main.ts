@@ -1,6 +1,7 @@
 import * as cache from '@actions/cache'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as path from 'path'
 
 export const c = {
   nixCachePath: '/tmp/nixcache',
@@ -32,7 +33,9 @@ const run = async () => {
   try {
     await Promise.all([
       prepareNix(),
-      exec.exec('install-direnv.sh', [], {env: {DIRENV_VERSION: c.direnvVersion}})
+      exec.exec(path.join(path.dirname(__filename), 'install-direnv.sh'), [], {
+        env: {DIRENV_VERSION: c.direnvVersion}
+      })
     ])
     await exec.exec('direnv allow')
     await exec.exec('direnv export gha >> "$GIHUB_ENV')
