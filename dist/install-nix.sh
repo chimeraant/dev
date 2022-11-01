@@ -18,5 +18,5 @@ set -e
     fi
   done
 
-  INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install" sh "$workdir/install"
+  INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install" bash "$workdir/install"
 }
