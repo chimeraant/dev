@@ -23,4 +23,4 @@ direnv allow
 direnv export gha >> "$GITHUB_ENV"
 
 
-bash ./direnv-allow.sh
+bash /home/runner/work/dev/dev/dist/direnv-allow.sh

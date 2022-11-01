@@ -24,4 +24,4 @@ export INPUT_EXTRA_NIX_CONFIG=""
 bash "$workdir/install"
 
 export DIRENV_VERSION="${DIRENV_VERSION}"
-bash ./install-direnv.sh
+bash /home/runner/work/dev/dev/dist/install-direnv.sh
