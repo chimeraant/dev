@@ -3,11 +3,11 @@ description: "Chimera Ant's development environment"
 author: 'Chimera Ant'
 inputs:
   nix-store-cache-key:
-    required: true
+    required: false
   nix-store-cache-restore-keys:
     required: false
   pnpm-store-cache-key:
-    required: true
+    required: false
   pnpm-store-cache-restore-keys:
     required: false
 runs:
