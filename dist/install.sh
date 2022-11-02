@@ -4,9 +4,9 @@ set -euo pipefail
 
 {
 
-  # ignore GITHUB_PATH for local installation
+  # Ignore GITHUB_PATH for local installation
   # GITHUB_PATH from the downloaded script is not added to path anyway
-  # path export is instead done using js toolkit
+  # Path export is instead done using js toolkit
   INPUT_EXTRA_NIX_CONFIG= \
   INPUT_INSTALL_OPTIONS= \
   INPUT_INSTALL_URL= \
@@ -14,6 +14,8 @@ set -euo pipefail
   GITHUB_PATH=/dev/null \
   bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh)
 
+  # Stripped version of https://github.com/direnv/direnv/blob/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh
+  # Able to pin direnv version and cache the direnv binary
   echo "::group::Installing direnv"
   : "${bin_path:=}"
   : "${cache_path:=}"
