@@ -7,6 +7,7 @@
     devShell.x86_64-linux = mkShell {
       buildInputs = [
         nodejs-16_x
+        nodePackages.pnpm
       ];
 
       shellHook = ''
