@@ -7,7 +7,7 @@ const setupNixDirenv = async () => {
   core.addPath('/nix/var/nix/profiles/default/bin');
   const [isNixCacheHit] = await Promise.all([nixCache.restore(), execScript('install.sh')]);
 
-  if (isNixCacheHit === 'true') {
+  if (isNixCacheHit !== undefined) {
     await execScript('import.sh', [nixCache.path]);
   }
 

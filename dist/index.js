@@ -36,7 +36,7 @@ const setupNixDirenv = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
     core.addPath('/nix/var/nix/profiles/default/bin');
     const [isNixCacheHit] = await Promise.all([util_1.nixCache.restore(), (0, util_1.execScript)('install.sh')]);
-    if (isNixCacheHit === 'true') {
+    if (isNixCacheHit !== undefined) {
         await (0, util_1.execScript)('import.sh', [util_1.nixCache.path]);
     }
     await (0, util_1.execScript)('direnv-setup.sh');
