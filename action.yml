@@ -4,8 +4,12 @@ author: 'Chimera Ant'
 inputs:
   nix-store-cache-key:
     required: true
+  nix-store-cache-restore-keys:
+    required: false
   pnpm-store-cache-key:
     required: true
+  pnpm-store-cache-restore-keys:
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
