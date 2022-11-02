@@ -15,7 +15,30 @@ set -euo pipefail
   bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh)
 
   echo "::group::Installing direnv"
-  curl -sfL https://direnv.net/install.sh | sudo bash
+  : "${bin_path:=}"
+  : "${cache_path:=}"
+
+  if [[ -z "$bin_path" ]]; then
+    for path in $(echo "$PATH" | tr ':' '\n'); do
+      if [[ -w $path ]]; then
+        bin_path=$path
+        break
+      fi
+    done
+  fi
+  if [[ -z "$bin_path" ]]; then
+    echo "did not find a writeable path in $PATH"
+    exit 1
+  fi
+  echo "bin_path=$bin_path"
+
+  if [[ -z "$cache_path" ]]; then
+    curl -o "$bin_path/direnv" -fL "https://github.com/direnv/direnv/releases/download/v2.32.1/direnv.linux-amd64"
+  else
+    cp "$cache_path" "$bin_path/direnv"
+  fi
+  chmod +x "$bin_path/direnv"
+
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
   grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
