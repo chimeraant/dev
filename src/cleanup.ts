@@ -3,14 +3,14 @@ import * as core from '@actions/core';
 import { execScript, nixCache, pnpmCache } from './util';
 
 const restoreNixStore = async () => {
-  if (!nixCache.isHit()) {
+  if (nixCache.shouldSave()) {
     await execScript('export.sh', [nixCache.path]);
     await nixCache.save();
   }
 };
 
 const restorePnpmStore = async () => {
-  if (!pnpmCache.isHit()) {
+  if (pnpmCache.shouldSave()) {
     await pnpmCache.save();
   }
 };

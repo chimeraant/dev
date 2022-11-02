@@ -33,13 +33,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7535));
 const util_1 = __nccwpck_require__(9652);
 const restoreNixStore = async () => {
-    if (!util_1.nixCache.isHit()) {
+    if (util_1.nixCache.shouldSave()) {
         await (0, util_1.execScript)('export.sh', [util_1.nixCache.path]);
         await util_1.nixCache.save();
     }
 };
 const restorePnpmStore = async () => {
-    if (!util_1.pnpmCache.isHit()) {
+    if (util_1.pnpmCache.shouldSave()) {
         await util_1.pnpmCache.save();
     }
 };
@@ -95,19 +95,22 @@ const path = __importStar(__nccwpck_require__(5622));
 const execScript = (scriptName, args) => exec.exec(path.join(path.dirname(__filename), scriptName), args);
 exports.execScript = execScript;
 const cacheConfig = (cachePath, keyInput, restoreKeyInput) => {
-    const key = core.getInput(keyInput);
+    const saveKey = core.getInput(keyInput);
+    const cacheStateId = keyInput;
     const restoreKeys = core.getInput(restoreKeyInput).split('\n');
     return {
         path: cachePath,
-        key,
-        isHit: () => core.getState(key) === 'true',
-        restore: async () => {
-            const cached = await cache.restoreCache([cachePath], key, restoreKeys);
-            const result = cached === undefined ? 'false' : 'true';
-            core.saveState(key, result);
-            return result;
+        key: saveKey,
+        shouldSave: () => {
+            const restoredKey = core.getState(`${cacheStateId}-restored-key`);
+            return saveKey !== restoredKey;
         },
-        save: () => cache.saveCache([cachePath], key),
+        restore: async () => {
+            const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys);
+            core.saveState(`${cacheStateId}-restored-key`, restoredKey);
+            return restoredKey;
+        },
+        save: () => cache.saveCache([cachePath], saveKey),
     };
 };
 exports.nixCache = cacheConfig('/tmp/nixcache', 'nix-store-cache-key', 'nix-store-cache-restore-keys');
