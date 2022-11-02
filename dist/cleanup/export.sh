@@ -14,5 +14,5 @@ nix-store --optimise
 echo "::endgroup::"
 
 echo "::group::Exporting nix store to ${1}"
-nix copy -s --no-check-sigs --to "file://$1" $(type -p playwright)
+nix copy -s --derivation --no-check-sigs --to "file://$1" $(type -p playwright)
 echo "::endgroup::"
