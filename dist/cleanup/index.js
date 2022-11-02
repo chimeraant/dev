@@ -103,10 +103,13 @@ const cacheConfig = (cachePath, keyInput, restoreKeyInput) => {
         key: saveKey,
         shouldSave: () => {
             const restoredKey = core.getState(`${cacheStateId}-restored-key`);
-            return saveKey !== restoredKey;
+            const isShouldSave = saveKey !== restoredKey;
+            core.info(`Cache should save: ${JSON.stringify({ cacheStateId, restoredKey, saveKey, isShouldSave })}`);
+            return isShouldSave;
         },
         restore: async () => {
             const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys);
+            core.info(`Cache restored: ${JSON.stringify({ cachePath, saveKey, restoreKeys, restoredKey })}`);
             core.saveState(`${cacheStateId}-restored-key`, restoredKey);
             return restoredKey;
         },
