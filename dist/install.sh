@@ -11,9 +11,10 @@ set -euo pipefail
   GITHUB_PATH=/dev/null \
   bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh)
 
-
   echo "::group::Installing direnv"
   nix-env -iA direnv -f 'channel:nixos-unstable'
+
+  which direnv
 
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
