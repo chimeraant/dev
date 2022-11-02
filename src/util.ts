@@ -52,7 +52,7 @@ const cacheConfig = async (
 const nixStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-nix-store-`;
 
 const logAndHash = async (pattern: string) => {
-  const globber = await glob.create(core.getInput('files'));
+  const globber = await glob.create(pattern);
   const files = [];
   for await (const file of globber.globGenerator()) {
     files.push(file);

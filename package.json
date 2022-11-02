@@ -9,7 +9,7 @@
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
-    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint"
+    "pre-push:dirty": "pnpm install && pnpm build && pnpm fix && git add . && git commit --no-edit --amend"
   },
   "repository": "https://github.com/chimeraant/dev",
   "keywords": [
