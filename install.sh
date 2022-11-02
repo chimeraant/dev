@@ -24,7 +24,8 @@ set -euo pipefail
     fi
   done
   if [[ -z "$bin_path" ]]; then
-    die "did not find a writeable path in $PATH"
+    echo "did not find a writeable path in $PATH"
+    exit 1
   fi
   curl -o "$bin_path/direnv" -fL "https://github.com/direnv/direnv/releases/download/v2.32.1/direnv.linux-amd64"
   chmod +x "$bin_path/direnv"
