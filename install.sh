@@ -15,14 +15,16 @@ set -euo pipefail
   curl -o "$workdir/install" -fL "https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh"
   bash "$workdir/install"
 
-  echo "::group::Installing direnv"
   # https://github.com/direnv/direnv/blob/c259d68a5b1bc9ca71c63368ea0fa9e0849565e0/install.sh
+  echo "::group::Installing direnv"
+  : "${bin_path:=}"
   for path in $(echo "$PATH" | tr ':' '\n'); do
     if [[ -w $path ]]; then
       bin_path=$path
       break
     fi
   done
+  echo "bin_path=$bin_path"
   if [[ -z "$bin_path" ]]; then
     echo "did not find a writeable path in $PATH"
     exit 1
