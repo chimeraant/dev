@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7535));
+const exec = __importStar(__nccwpck_require__(1062));
 const util_1 = __nccwpck_require__(9652);
 const restoreNixStore = async () => {
     if (util_1.nixCache.shouldSave()) {
@@ -40,6 +41,7 @@ const restoreNixStore = async () => {
 };
 const restorePnpmStore = async () => {
     if (util_1.pnpmCache.shouldSave()) {
+        await exec.exec('pnpm store prune');
         await util_1.pnpmCache.save();
     }
 };
