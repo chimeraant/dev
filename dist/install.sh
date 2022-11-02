@@ -3,6 +3,7 @@
 set -euo pipefail
 
 {
+
   export INPUT_EXTRA_NIX_CONFIG=
   export INPUT_INSTALL_OPTIONS=
   export INPUT_INSTALL_URL=
@@ -16,4 +17,5 @@ set -euo pipefail
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
   grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
+
 }
