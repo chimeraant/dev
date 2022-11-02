@@ -43,7 +43,7 @@ const setupNixDirenv = async () => {
 };
 const run = async () => {
     try {
-        await Promise.all([setupNixDirenv, util_1.pnpmCache.restore()]);
+        await Promise.all([setupNixDirenv(), util_1.pnpmCache.restore()]);
     }
     catch (error) {
         if (error instanceof Error) {
