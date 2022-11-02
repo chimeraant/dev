@@ -8,7 +8,7 @@
     "build": "NODE_OPTIONS=--openssl-legacy-provider pnpm build:ci",
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
-    "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
+    "pre-push": "pnpm pre-push:dirty",
     "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint"
   },
   "repository": "https://github.com/chimeraant/dev",
