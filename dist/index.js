@@ -138,7 +138,7 @@ const logAndHash = async (pattern) => {
     return hash;
 };
 const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', async () => {
-    const hash = await logAndHash('+(flake.lock|flake.nix)');
+    const hash = await logAndHash('(flake.lock|flake.nix)');
     return `${nixStoreCacheKeyPrefix}${hash}`;
 }, 'nix-store-cache-restore-keys', [nixStoreCacheKeyPrefix]);
 exports.getNixCache = getNixCache;
