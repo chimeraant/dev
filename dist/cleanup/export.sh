@@ -14,4 +14,5 @@ nix-store --optimise
 echo "::endgroup::"
 
 echo "::group::Exporting nix store to ${1}"
-nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > "$1"
+nix copy --no-check-sigs --to $1 devShell.x86_64-linux
+echo "::endgroup::"
