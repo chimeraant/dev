@@ -12,4 +12,8 @@ set -euo pipefail
   echo "::group::Installing direnv"
   curl -sfL https://direnv.net/install.sh | bash
   echo "::endgroup::"
+
+  LINE='eval "\$(direnv hook bash)"'
+  FILE="$HOME/.profile"
+  grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
 }
