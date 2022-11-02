@@ -14,7 +14,7 @@ set -euo pipefail
   echo "::group::Installing direnv"
   nix-env -iA direnv -f 'channel:nixos-unstable'
 
-  which direnv
+  echo $(which direnv)
 
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
