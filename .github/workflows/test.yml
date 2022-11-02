@@ -1,0 +1,98 @@
+name: 'test'
+on: 
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  lint: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
+
+  test-pre-cache: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./
+        with:
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
+          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
+
+      - run: playwright pdf google.com a.pdf
+
+  test: # make sure the action works on a clean machine without building
+    needs: test-pre-cache
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./
+        with:
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
+          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
+
+      - run: playwright pdf google.com a.pdf
+
+  check-dist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Rebuild the dist/ directory
+        run: pnpm build:ci
+
+      - name: Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
+        id: diff
+
+      # If index.js was different than expected, upload the expected version as an artifact
+      - uses: actions/upload-artifact@v2
+        if: ${{ failure() && steps.diff.conclusion == 'failure' }}
+        with:
+          name: dist
+          path: dist/
