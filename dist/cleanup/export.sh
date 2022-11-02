@@ -14,5 +14,5 @@ nix-store --optimise
 echo "::endgroup::"
 
 echo "::group::Exporting nix store to ${1}"
-nix copy --to "file://$1" $(find /nix/store -maxdepth 1 -name '*-*') 
+nix copy --no-check-sigs --to "file://$1" $(type -p playwright)
 echo "::endgroup::"

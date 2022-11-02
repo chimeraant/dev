@@ -7,6 +7,7 @@ on:
 
 jobs:
   lint-and-check-dist:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +25,7 @@ jobs:
         id: diff
 
   test:
+    timeout-minutes: 5
     runs-on: ubuntu-22.04
     needs: lint-and-check-dist
     steps:
@@ -32,6 +34,7 @@ jobs:
       - run: playwright pdf google.com a.pdf
 
   release:
+    timeout-minutes: 5
     needs: test
     runs-on: ubuntu-latest
     steps:
