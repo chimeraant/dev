@@ -13,13 +13,10 @@ set -euo pipefail
 
 
   echo "::group::Installing direnv"
-  if type -p direnv &>/dev/null ; then
-    echo "Skip installing direnv: already installed at $(type -p direnv)"
-  else
-    curl -sfL https://direnv.net/install.sh | bash
-    LINE='eval "\$(direnv hook bash)"'
-    FILE="$HOME/.profile"
-    grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
-  fi
+  nix-env -iA direnv -f 'channel:nixos-unstable'
+
+  LINE='eval "\$(direnv hook bash)"'
+  FILE="$HOME/.profile"
+  grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
   echo "::endgroup::"
 }
