@@ -32,19 +32,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7535));
 const util_1 = __nccwpck_require__(9652);
+const setupNixDirenv = async () => {
+    // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
+    core.addPath('/nix/var/nix/profiles/default/bin');
+    const [isNixCacheHit] = await Promise.all([util_1.nixCache.restore(), (0, util_1.execScript)('install.sh')]);
+    if (isNixCacheHit === 'true') {
+        await (0, util_1.execScript)('import.sh', [util_1.nixCache.path]);
+    }
+    await (0, util_1.execScript)('direnv-setup.sh');
+};
 const run = async () => {
     try {
-        // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
-        core.addPath('/nix/var/nix/profiles/default/bin');
-        const [isNixCacheHit] = await Promise.all([
-            util_1.nixCache.restore(),
-            util_1.pnpmCache.restore(),
-            (0, util_1.execScript)('install.sh'),
-        ]);
-        if (isNixCacheHit === 'true') {
-            await (0, util_1.execScript)('import.sh', [util_1.nixCache.path]);
-        }
-        await (0, util_1.execScript)('direnv-setup.sh');
+        await Promise.all([setupNixDirenv, util_1.pnpmCache.restore()]);
     }
     catch (error) {
         if (error instanceof Error) {

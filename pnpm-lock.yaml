@@ -7,6 +7,7 @@ specifiers:
   '@types/node': ^18.11.8
   '@vercel/ncc': ^0.31.1
   eslint: ^8.25.0
+  fp-ts: ^2.13.1
   js-yaml: ^4.1.0
   nazna: ^1.13.19
   pnpm: ^7.13.4
@@ -22,6 +23,7 @@ devDependencies:
   '@types/node': 18.11.8
   '@vercel/ncc': 0.31.1
   eslint: 8.26.0
+  fp-ts: 2.13.1
   js-yaml: 4.1.0
   nazna: 1.13.19_mlnmzotqg7eeoy4ljcukb4c5w4
   pnpm: 7.14.1

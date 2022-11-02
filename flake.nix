@@ -15,7 +15,6 @@
       shellHook = ''
         export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-chromium}
         export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-
         function assertEqual {
           result="$(eval "$1")"
           if [[ "$result" != "$2" ]]; then
