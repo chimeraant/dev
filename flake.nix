@@ -8,6 +8,7 @@
       buildInputs = [
         nodejs-16_x
         nodePackages.pnpm
+        playwright
       ];
 
       shellHook = ''
