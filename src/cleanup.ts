@@ -1,14 +1,23 @@
-import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 
-import { cacheHitState, cacheKey, cachePath, execScript } from './util';
+import { execScript, nixCache, pnpmCache } from './util';
+
+const restoreNixStore = async () => {
+  if (!nixCache.isHit()) {
+    await execScript('export.sh', [nixCache.path]);
+    await nixCache.save();
+  }
+};
+
+const restorePnpmStore = async () => {
+  if (!pnpmCache.isHit()) {
+    await pnpmCache.save();
+  }
+};
 
 const run = async () => {
   try {
-    if (cacheHitState.get() !== 'hit') {
-      await execScript('export.sh', [cachePath]);
-      await cache.saveCache([cachePath], cacheKey);
-    }
+    await Promise.all([restoreNixStore(), restorePnpmStore()]);
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);

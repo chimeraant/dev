@@ -30,20 +30,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const util_1 = __nccwpck_require__(9652);
 const run = async () => {
     try {
         // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
         core.addPath('/nix/var/nix/profiles/default/bin');
-        const [cached] = await Promise.all([
-            cache.restoreCache([util_1.cachePath], util_1.cacheKey),
+        const [isNixCacheHit] = await Promise.all([
+            util_1.nixCache.restore(),
+            util_1.pnpmCache.restore(),
             (0, util_1.execScript)('install.sh'),
         ]);
-        if (cached) {
-            util_1.cacheHitState.save('hit');
-            await (0, util_1.execScript)('import.sh', [util_1.cachePath]);
+        if (isNixCacheHit === 'true') {
+            await (0, util_1.execScript)('import.sh', [util_1.nixCache.path]);
         }
         await (0, util_1.execScript)('direnv-setup.sh');
     }
@@ -87,19 +86,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cacheHitState = exports.cacheKey = exports.cachePath = exports.execScript = void 0;
+exports.pnpmCache = exports.nixCache = exports.execScript = void 0;
+const cache = __importStar(__nccwpck_require__(6110));
 const core = __importStar(__nccwpck_require__(7535));
 const exec = __importStar(__nccwpck_require__(1062));
 const path = __importStar(__nccwpck_require__(5622));
 const execScript = (scriptName, args) => exec.exec(path.join(path.dirname(__filename), scriptName), args);
 exports.execScript = execScript;
-exports.cachePath = '/tmp/nixcache';
-exports.cacheKey = core.getInput('nix-store-key');
-const isCacheHitKey = 'isCacheHit';
-exports.cacheHitState = {
-    get: () => core.getState(isCacheHitKey),
-    save: (val) => core.saveState(isCacheHitKey, val),
-};
+const cacheConfig = (cachePath, key) => ({
+    path: cachePath,
+    key: core.getInput(key),
+    isHit: () => core.getState(key) === 'true',
+    restore: async () => {
+        const cached = await cache.restoreCache([cachePath], key);
+        const result = cached === undefined ? 'false' : 'true';
+        core.saveState(key, result);
+        return result;
+    },
+    save: () => cache.saveCache([cachePath], key),
+});
+exports.nixCache = cacheConfig('/tmp/nixcache', 'nix-store-cache-key');
+exports.pnpmCache = cacheConfig('~/.local/share/pnpm/store', 'pnpm-store-cache-key');
 //# sourceMappingURL=util.js.map
 
 /***/ }),

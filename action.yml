@@ -2,7 +2,9 @@ name: 'Chimera Ant Development Environment'
 description: "Chimera Ant's development environment"
 author: 'Chimera Ant'
 inputs:
-  nix-store-key:
+  nix-store-cache-key:
+    required: true
+  pnpm-store-cache-key:
     required: true
 runs:
   using: 'node16'

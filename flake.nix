@@ -28,6 +28,7 @@
         }
         assertEqual "nix --version" "nix (Nix) 2.11.0" || exit 1
         assertEqual "direnv --version" "2.32.1" || exit 1
+        pnpm install
       '';
     };
   };

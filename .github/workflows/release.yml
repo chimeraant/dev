@@ -37,7 +37,8 @@ jobs:
 
       - uses: ./
         with:
-          nix-store-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: playwright pdf google.com a.pdf
 
@@ -49,7 +50,8 @@ jobs:
 
       - uses: ./
         with:
-          nix-store-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - run: playwright pdf google.com a.pdf
 
