@@ -1,0 +1,31 @@
+name: 'cache-test'
+on: 
+  push:
+    branches:
+      - cache-test
+
+jobs:
+  test-pre-cache: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./
+        with:
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
+          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
+
+  test: # make sure the action works on a clean machine without building
+    needs: test-pre-cache
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./
+        with:
+          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
+          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
+          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
