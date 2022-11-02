@@ -1,1 +1,1 @@
-dist/** -diff linguist-generated=true 
+dist/**!(*.sh) -diff linguist-generated=true 
