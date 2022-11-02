@@ -8,7 +8,7 @@ set -euo pipefail
   INPUT_INSTALL_OPTIONS= \
   INPUT_INSTALL_URL= \
   INPUT_NIX_PATH="nixpkgs=channel:nixos-unstable" \
-  curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh | bash
+  bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh)
 
   nix-env -f '<nixpkgs>' -iA direnv
 
