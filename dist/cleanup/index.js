@@ -117,7 +117,7 @@ const cacheConfig = (cachePath, keyInput, restoreKeyInput) => {
     };
 };
 exports.nixCache = cacheConfig('/tmp/nixcache', 'nix-store-cache-key', 'nix-store-cache-restore-keys');
-exports.pnpmCache = cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-store-cache-key', 'pnpm-store-restore-keys');
+exports.pnpmCache = cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-store-cache-key', 'pnpm-store-cache-restore-keys');
 //# sourceMappingURL=util.js.map
 
 /***/ }),

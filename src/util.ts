@@ -41,5 +41,5 @@ export const nixCache = cacheConfig(
 export const pnpmCache = cacheConfig(
   '~/.local/share/pnpm/store/v3',
   'pnpm-store-cache-key',
-  'pnpm-store-restore-keys'
+  'pnpm-store-cache-restore-keys'
 );
