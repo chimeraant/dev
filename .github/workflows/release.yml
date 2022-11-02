@@ -37,10 +37,6 @@ jobs:
 
       - uses: ./
         with:
-          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
-          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
-          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
 
       - run: playwright pdf google.com a.pdf
 
@@ -51,12 +47,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: ./
-        with:
-          nix-store-cache-key: ${{ runner.os }}-nix-store-${{ hashFiles('flake.lock', 'flake.nix') }}
-          pnpm-store-cache-key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          nix-store-cache-restore-keys: ${{ runner.os }}-nix-store-
-          pnpm-store-cache-restore-keys: ${{ runner.os }}-pnpm-store-
-
       - run: playwright pdf google.com a.pdf
 
   check-dist:

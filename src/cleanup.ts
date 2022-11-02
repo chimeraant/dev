@@ -1,9 +1,10 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-import { execScript, nixCache, pnpmCache } from './util';
+import { execScript, getNixCache, getPnpmCache } from './util';
 
 const restoreNixStore = async () => {
+  const nixCache = await getNixCache();
   if (nixCache.shouldSave()) {
     await execScript('export.sh', [nixCache.path]);
     await nixCache.save();
@@ -11,6 +12,7 @@ const restoreNixStore = async () => {
 };
 
 const restorePnpmStore = async () => {
+  const pnpmCache = await getPnpmCache();
   if (pnpmCache.shouldSave()) {
     await exec.exec('pnpm store prune');
     await pnpmCache.save();
