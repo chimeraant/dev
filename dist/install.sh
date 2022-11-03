@@ -24,13 +24,11 @@ set -euo pipefail
 
 
   echo "::group::Debug"
-  if [[ -z "$bin_path" ]]; then
-    echo "bin_path is not set, you can set bin_path to specify the installation path"
-    echo "e.g. export bin_path=/path/to/installation before installing"
-    echo "looking for a writeable path from PATH environment variable"
-    for path in $(echo "$PATH" | tr ':' '\n'); do
-      echo "$path"
-    done
-  fi
+  echo "bin_path is not set, you can set bin_path to specify the installation path"
+  echo "e.g. export bin_path=/path/to/installation before installing"
+  echo "looking for a writeable path from PATH environment variable"
+  for path in $(echo "$PATH" | tr ':' '\n'); do
+    echo "$path"
+  done
   echo "::endgroup::"
 }
