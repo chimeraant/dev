@@ -88,6 +88,9 @@ export const getPnpmCache = () =>
     [pnpmStoreCacheKeyPrefix]
   );
 
-export const direnvBinPath = '/usr/local/bin';
-
-export const direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;
+export const direnv = {
+  installBinDir: '/usr/local/bin',
+  cacheKey: `${process.env['RUNNER_OS']}-direnv-v2.32.0`,
+  cacheDir: '/tmp/direnv-cache',
+  stateKey: 'direnv-state-key',
+};

@@ -49,9 +49,10 @@ const restorePnpmStore = async () => {
     }
 };
 const restoreDirenvCache = async () => {
-    const isDirenvCacheHit = core.getState(util_1.direnvCacheKey);
-    if (isDirenvCacheHit === 'false') {
-        await cache.saveCache([`${util_1.direnvBinPath}/direnv`], util_1.direnvCacheKey);
+    const isCacheHit = core.getState(util_1.direnv.stateKey);
+    if (isCacheHit === 'false') {
+        const installedBin = `${util_1.direnv.installBinDir}/direnv`;
+        await cache.saveCache([installedBin], util_1.direnv.cacheKey);
     }
 };
 const run = async () => {
@@ -98,7 +99,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.direnvCacheKey = exports.direnvBinPath = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
+exports.direnv = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
@@ -152,8 +153,12 @@ const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-sto
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
 exports.getPnpmCache = getPnpmCache;
-exports.direnvBinPath = '/usr/local/bin';
-exports.direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;
+exports.direnv = {
+    installBinDir: '/usr/local/bin',
+    cacheKey: `${process.env['RUNNER_OS']}-direnv-v2.32.0`,
+    cacheDir: '/tmp/direnv-cache',
+    stateKey: 'direnv-state-key',
+};
 //# sourceMappingURL=util.js.map
 
 /***/ }),

@@ -34,15 +34,14 @@ const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const util_1 = __nccwpck_require__(3175);
 const cacheAndInstall = async () => {
-    const direnvCacheDir = '/tmp/direnv-cache';
-    const restoredKey = await cache.restoreCache([direnvCacheDir], util_1.direnvCacheKey);
+    const restoredKey = await cache.restoreCache([util_1.direnv.cacheDir], util_1.direnv.cacheKey);
     const isDirenvCacheHit = `${restoredKey !== undefined}`;
-    core.saveState(util_1.direnvCacheKey, isDirenvCacheHit);
+    core.saveState(util_1.direnv.stateKey, isDirenvCacheHit);
     await (0, util_1.execScript)('install.sh', [], {
         env: {
             ...process.env,
-            cached_bin: `${direnvCacheDir}/direnv`,
-            bin_path: util_1.direnvBinPath,
+            cached_bin: `${util_1.direnv.cacheDir}/direnv`,
+            bin_path: util_1.direnv.installBinDir,
         },
     });
 };
@@ -106,7 +105,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.direnvCacheKey = exports.direnvBinPath = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
+exports.direnv = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
@@ -160,8 +159,12 @@ const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-sto
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
 exports.getPnpmCache = getPnpmCache;
-exports.direnvBinPath = '/usr/local/bin';
-exports.direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;
+exports.direnv = {
+    installBinDir: '/usr/local/bin',
+    cacheKey: `${process.env['RUNNER_OS']}-direnv-v2.32.0`,
+    cacheDir: '/tmp/direnv-cache',
+    stateKey: 'direnv-state-key',
+};
 //# sourceMappingURL=util.js.map
 
 /***/ }),

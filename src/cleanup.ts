@@ -2,7 +2,7 @@ import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-import { direnvBinPath, direnvCacheKey, execScript, getNixCache, getPnpmCache } from './util';
+import { direnv, execScript, getNixCache, getPnpmCache } from './util';
 
 const restoreNixStore = async () => {
   const nixCache = await getNixCache();
@@ -21,9 +21,10 @@ const restorePnpmStore = async () => {
 };
 
 const restoreDirenvCache = async () => {
-  const isDirenvCacheHit = core.getState(direnvCacheKey);
-  if (isDirenvCacheHit === 'false') {
-    await cache.saveCache([`${direnvBinPath}/direnv`], direnvCacheKey);
+  const isCacheHit = core.getState(direnv.stateKey);
+  if (isCacheHit === 'false') {
+    const installedBin = `${direnv.installBinDir}/direnv`;
+    await cache.saveCache([installedBin], direnv.cacheKey);
   }
 };
 
