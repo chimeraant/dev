@@ -30,18 +30,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const util_1 = __nccwpck_require__(3175);
+const cacheAndInstall = async () => {
+    const direnvCachePath = '/tmp/direnv';
+    const restoredKey = await cache.restoreCache([direnvCachePath], util_1.direnvCacheKey);
+    const isDirenvCacheHit = `${restoredKey !== undefined}`;
+    core.saveState(util_1.direnvCacheKey, isDirenvCacheHit);
+    await (0, util_1.execScript)('install.sh', [], {
+        env: {
+            ...process.env,
+            cached_bin: direnvCachePath,
+            bin_path: util_1.direnvBinPath,
+        },
+    });
+};
 const setupNixCache = async () => {
     const nixCache = await (0, util_1.getNixCache)();
     const restoredCacheKey = await nixCache.restore();
     return [nixCache, restoredCacheKey];
 };
 const setupNixDirenv = async () => {
-    const [[nixCache, restoredCacheKey]] = await Promise.all([
-        setupNixCache(),
-        (0, util_1.execScript)('install.sh'),
-    ]);
+    const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
     if (restoredCacheKey !== undefined) {
         await (0, util_1.execScript)('import.sh', [nixCache.path]);
     }
@@ -95,13 +106,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
+exports.direnvCacheKey = exports.direnvBinPath = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const glob = __importStar(__nccwpck_require__(1770));
 const path = __importStar(__nccwpck_require__(1017));
-const execScript = (scriptName, args) => exec.exec(path.join(path.dirname(__filename), scriptName), args);
+const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 exports.execScript = execScript;
 const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : await defaultStr();
 const nonEmptyArrOrElse = (arr, defaultArr) => arr.length > 0 ? arr : defaultArr;
@@ -149,6 +160,8 @@ const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-sto
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
 exports.getPnpmCache = getPnpmCache;
+exports.direnvBinPath = '/usr/local/bin';
+exports.direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;
 //# sourceMappingURL=util.js.map
 
 /***/ }),

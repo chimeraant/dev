@@ -1,7 +1,8 @@
+import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-import { execScript, getNixCache, getPnpmCache } from './util';
+import { direnvBinPath, direnvCacheKey, execScript, getNixCache, getPnpmCache } from './util';
 
 const restoreNixStore = async () => {
   const nixCache = await getNixCache();
@@ -19,9 +20,16 @@ const restorePnpmStore = async () => {
   }
 };
 
+const restoreDirenvCache = async () => {
+  const isDirenvCacheHit = core.getState(direnvCacheKey);
+  if (isDirenvCacheHit === 'false') {
+    await cache.saveCache([direnvBinPath], direnvCacheKey);
+  }
+};
+
 const run = async () => {
   try {
-    await Promise.all([restoreNixStore(), restorePnpmStore()]);
+    await Promise.all([restoreNixStore(), restorePnpmStore(), restoreDirenvCache()]);
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);

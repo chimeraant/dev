@@ -80,18 +80,23 @@ set -euo pipefail
   fi
   echo "bin_path=$bin_path"
 
-  : "${cache_path:=}"
-  : "${release_id:=latest}"
+  : "${cached_bin:=}"
+  : "${version:=}"
 
-  cached_bin="$cache_path/$release_id/direnv.$kernel.$machine"
-
-  if [[ -r "$cached_bin"  ]]; then
+  if [[ -f "$cached_bin" ]]; then
     log "found cached binary on $cached_bin"
     cp "$cached_bin" "$bin_path/direnv"
   else
     log "looking for a download URL"
+
+    if [[ -n "$version" ]]; then
+      release_url="https://api.github.com/repos/direnv/direnv/releases/tags/$version"
+    else
+      release_url="https://api.github.com/repos/direnv/direnv/releases/latest"
+    fi
+
     download_url=$(
-      curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release_id" \
+      curl -fL "$release_url" \
       | grep browser_download_url \
       | cut -d '"' -f 4 \
       | grep "direnv.$kernel.$machine"

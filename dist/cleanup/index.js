@@ -30,6 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const util_1 = __nccwpck_require__(3175);
@@ -47,9 +48,15 @@ const restorePnpmStore = async () => {
         await pnpmCache.save();
     }
 };
+const restoreDirenvCache = async () => {
+    const isDirenvCacheHit = core.getState(util_1.direnvCacheKey);
+    if (isDirenvCacheHit === 'false') {
+        await cache.saveCache([util_1.direnvBinPath], util_1.direnvCacheKey);
+    }
+};
 const run = async () => {
     try {
-        await Promise.all([restoreNixStore(), restorePnpmStore()]);
+        await Promise.all([restoreNixStore(), restorePnpmStore(), restoreDirenvCache()]);
     }
     catch (error) {
         if (error instanceof Error) {
@@ -91,13 +98,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
+exports.direnvCacheKey = exports.direnvBinPath = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const glob = __importStar(__nccwpck_require__(1770));
 const path = __importStar(__nccwpck_require__(1017));
-const execScript = (scriptName, args) => exec.exec(path.join(path.dirname(__filename), scriptName), args);
+const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 exports.execScript = execScript;
 const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : await defaultStr();
 const nonEmptyArrOrElse = (arr, defaultArr) => arr.length > 0 ? arr : defaultArr;
@@ -145,6 +152,8 @@ const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-sto
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
 exports.getPnpmCache = getPnpmCache;
+exports.direnvBinPath = '/usr/local/bin';
+exports.direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;
 //# sourceMappingURL=util.js.map
 
 /***/ }),

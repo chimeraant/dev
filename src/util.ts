@@ -4,8 +4,8 @@ import * as exec from '@actions/exec';
 import * as glob from '@actions/glob';
 import * as path from 'path';
 
-export const execScript = (scriptName: string, args?: string[]) =>
-  exec.exec(path.join(path.dirname(__filename), scriptName), args);
+export const execScript = (scriptName: string, args?: string[], execOptions?: exec.ExecOptions) =>
+  exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 
 const nonEmptyStrOrElse = async (str: string, defaultStr: () => Promise<string>) =>
   str !== '' ? str : await defaultStr();
@@ -87,3 +87,7 @@ export const getPnpmCache = () =>
     'pnpm-store-cache-restore-keys',
     [pnpmStoreCacheKeyPrefix]
   );
+
+export const direnvBinPath = '/usr/local/bin';
+
+export const direnvCacheKey = `${process.env['RUNNER_OS']}-direnv-v2.32.0`;

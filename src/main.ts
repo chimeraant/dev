@@ -1,6 +1,22 @@
+import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 
-import { execScript, getNixCache, getPnpmCache } from './util';
+import { direnvBinPath, direnvCacheKey, execScript, getNixCache, getPnpmCache } from './util';
+
+const cacheAndInstall = async () => {
+  const direnvCachePath = '/tmp/direnv';
+  const restoredKey = await cache.restoreCache([direnvCachePath], direnvCacheKey);
+  const isDirenvCacheHit = `${restoredKey !== undefined}`;
+  core.saveState(direnvCacheKey, isDirenvCacheHit);
+
+  await execScript('install.sh', [], {
+    env: {
+      ...process.env,
+      cached_bin: direnvCachePath,
+      bin_path: direnvBinPath,
+    },
+  });
+};
 
 const setupNixCache = async () => {
   const nixCache = await getNixCache();
@@ -9,10 +25,7 @@ const setupNixCache = async () => {
 };
 
 const setupNixDirenv = async () => {
-  const [[nixCache, restoredCacheKey]] = await Promise.all([
-    setupNixCache(),
-    execScript('install.sh'),
-  ]);
+  const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
 
   if (restoredCacheKey !== undefined) {
     await execScript('import.sh', [nixCache.path]);
