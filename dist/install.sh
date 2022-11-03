@@ -4,122 +4,19 @@ set -euo pipefail
 
 {
 
-  # Ignore GITHUB_PATH for local installation
+  # Ignore GITHUB_PATH and GITHUB_ENV for local installation
   # GITHUB_PATH from the downloaded script is not added to path anyway
   # Path export is instead done using js toolkit
   INPUT_EXTRA_NIX_CONFIG= \
   INPUT_INSTALL_OPTIONS= \
   INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-2.11.0/install" \
-  INPUT_NIX_PATH= \
+  INPUT_NIX_PATH="ixpkgs=channel:nixos-unstable" \
   GITHUB_PATH=/dev/null \
+  GITHUB_ENV=/dev/null \
   bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh)
 
-  # Stripped version of https://github.com/direnv/direnv/blob/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh
-  # Able to pin direnv version and cache the direnv binary
-
-  log() {
-    echo "[installer] $*" >&2
-  }
-
-  die() {
-    log "$@"
-    exit 1
-  }
-
-  at_exit() {
-    ret=$?
-    if [[ $ret -gt 0 ]]; then
-      log "the script failed with error $ret.\n" \
-        "\n" \
-        "To report installation errors, submit an issue to\n" \
-        "    https://github.com/direnv/direnv/issues/new/choose"
-    fi
-    exit "$ret"
-  }
-  trap at_exit EXIT
-
-  kernel=$(uname -s | tr "[:upper:]" "[:lower:]")
-  case "${kernel}" in
-    mingw*)
-      kernel=windows
-      ;;
-  esac
-  case "$(uname -m)" in
-    x86_64)
-      machine=amd64
-      ;;
-    i686 | i386)
-      machine=386
-      ;;
-    aarch64 | arm64)
-      machine=arm64
-      ;;
-    *)
-      die "Machine $(uname -m) not supported by the installer.\n" \
-        "Go to https://direnv for alternate installation methods."
-      ;;
-  esac
-  log "kernel=$kernel machine=$machine"
-
-  : "${use_sudo:=}"
-  : "${bin_path:=}"
-
-  if [[ -z "$bin_path" ]]; then
-    log "bin_path is not set, you can set bin_path to specify the installation path"
-    log "e.g. export bin_path=/path/to/installation before installing"
-    log "looking for a writeable path from PATH environment variable"
-    for path in $(echo "$PATH" | tr ':' '\n'); do
-      if [[ -w $path ]]; then
-        bin_path=$path
-        break
-      fi
-    done
-  fi
-  if [[ -z "$bin_path" ]]; then
-    die "did not find a writeable path in $PATH"
-  fi
-  echo "bin_path=$bin_path"
-
-  : "${cached_bin:=}"
-  : "${version:=}"
-
-  if [[ -f "$cached_bin" ]]; then
-    log "found cached binary on $cached_bin"
-    cp "$cached_bin" "$bin_path/direnv"
-  else
-    log "looking for a download URL"
-
-    if [[ -n "$version" ]]; then
-      release_url="https://api.github.com/repos/direnv/direnv/releases/tags/$version"
-    else
-      release_url="https://api.github.com/repos/direnv/direnv/releases/latest"
-    fi
-
-    download_url=$(
-      curl -fL "$release_url" \
-      | grep browser_download_url \
-      | cut -d '"' -f 4 \
-      | grep "direnv.$kernel.$machine"
-    )
-
-    echo "download_url=$download_url"
-
-    log "downloading"
-    curl -o "$bin_path/direnv" -fL "$download_url"
-  fi
-
-  chmod +x "$bin_path/direnv"
-
-  cat <<DONE
-The direnv binary is now available in:
-    $bin_path/direnv
-The last step is to configure your shell to use it. For example for bash, add
-the following lines at the end of your ~/.bashrc:
-    eval "\$(direnv hook bash)"
-Then restart the shell.
-For other shells, see https://direnv.net/docs/hook.html
-Thanks!
-DONE
+  nix-env --install --attr direnv nix-direnv -f '<nixpkgs>'
+  echo "source $HOME/.nix-profile/share/nix-direnv/direnvrc" >> $HOME/.direnvrc
 
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
