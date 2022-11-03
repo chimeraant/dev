@@ -17,6 +17,7 @@ set -euo pipefail
   echo "::group::Installing direnv"
   # https://lazamar.co.uk/nix-versions/?package=direnv&version=2.32.1&fullName=direnv-2.32.1&keyName=direnv&revision=ee01de29d2f58d56b1be4ae24c24bd91c5380cea&channel=nixpkgs-unstable#instructions
   nix-env -iA direnv -f https://github.com/NixOS/nixpkgs/archive/ee01de29d2f58d56b1be4ae24c24bd91c5380cea.tar.gz
+  direnv allow
   LINE='eval "\$(direnv hook bash)"'
   FILE="$HOME/.profile"
   grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
