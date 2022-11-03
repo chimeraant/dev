@@ -6,9 +6,9 @@ source "$HOME/.profile"
 source $HOME/.nix-profile/share/nix-direnv/direnvrc
 
 echo "::group::direnv allow"
-direnv allow
+/nix/var/nix/profiles/default/bin/direnv allow
 echo "::endgroup::"
 
 echo "::group::Exporting direnv environment variables to GitHub Action"
-direnv export gha >> "$GITHUB_ENV"
+/nix/var/nix/profiles/default/bin/direnv export gha >> "$GITHUB_ENV"
 echo "::endgroup::"
