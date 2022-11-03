@@ -4,15 +4,15 @@ import * as core from '@actions/core';
 import { direnvBinPath, direnvCacheKey, execScript, getNixCache, getPnpmCache } from './util';
 
 const cacheAndInstall = async () => {
-  const direnvCachePath = '/tmp/direnv';
-  const restoredKey = await cache.restoreCache([direnvCachePath], direnvCacheKey);
+  const direnvCacheDir = '/tmp/direnv-cache';
+  const restoredKey = await cache.restoreCache([direnvCacheDir], direnvCacheKey);
   const isDirenvCacheHit = `${restoredKey !== undefined}`;
   core.saveState(direnvCacheKey, isDirenvCacheHit);
 
   await execScript('install.sh', [], {
     env: {
       ...process.env,
-      cached_bin: direnvCachePath,
+      cached_bin: `${direnvCacheDir}/direnv`,
       bin_path: direnvBinPath,
     },
   });

@@ -34,14 +34,14 @@ const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const util_1 = __nccwpck_require__(3175);
 const cacheAndInstall = async () => {
-    const direnvCachePath = '/tmp/direnv';
-    const restoredKey = await cache.restoreCache([direnvCachePath], util_1.direnvCacheKey);
+    const direnvCacheDir = '/tmp/direnv-cache';
+    const restoredKey = await cache.restoreCache([direnvCacheDir], util_1.direnvCacheKey);
     const isDirenvCacheHit = `${restoredKey !== undefined}`;
     core.saveState(util_1.direnvCacheKey, isDirenvCacheHit);
     await (0, util_1.execScript)('install.sh', [], {
         env: {
             ...process.env,
-            cached_bin: direnvCachePath,
+            cached_bin: `${direnvCacheDir}/direnv`,
             bin_path: util_1.direnvBinPath,
         },
     });
