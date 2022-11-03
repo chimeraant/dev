@@ -16,7 +16,6 @@ set -euo pipefail
   echo "::group::Installing direnv"
   if $(type -p direnv &>/dev/null) && [[ "v$(direnv --version)" == "$direnv_version" ]] ; then
     echo "Aborting: Direnv version v$(direnv --version) is already installed at $(type -p direnv)"
-    exit
   else
     echo "[installer] path: $(type -p direnv)"
     echo "[installer] version: $(direnv --version)"
