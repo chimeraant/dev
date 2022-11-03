@@ -23,8 +23,7 @@ const restorePnpmStore = async () => {
 const restoreDirenvCache = async () => {
   const isCacheHit = core.getState(direnv.stateKey);
   if (isCacheHit === 'false') {
-    const installedBin = `${direnv.installBinDir}/direnv`;
-    await cache.saveCache([installedBin], direnv.cacheKey);
+    await cache.saveCache([`${direnv.installBinDir}/direnv`], direnv.cacheKey);
   }
 };
 

@@ -4,7 +4,7 @@ import * as core from '@actions/core';
 import { direnv, execScript, getNixCache, getPnpmCache } from './util';
 
 const cacheAndInstall = async () => {
-  const restoredKey = await cache.restoreCache([direnv.installBinDir], direnv.cacheKey);
+  const restoredKey = await cache.restoreCache([`${direnv.installBinDir}/direnv`], direnv.cacheKey);
   const isDirenvCacheHit = `${restoredKey !== undefined}`;
   core.saveState(direnv.stateKey, isDirenvCacheHit);
 

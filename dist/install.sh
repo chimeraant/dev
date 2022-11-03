@@ -20,7 +20,7 @@ set -euo pipefail
   else
     export bin_path="$direnv_bin_path"
     export version="$direnv_version"
-    curl -sfL https://raw.githubusercontent.com/direnv/direnv/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh | sudo --preserve-env bash
+    bash <(curl -sfL https://raw.githubusercontent.com/direnv/direnv/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh)
   fi
   echo "::endgroup::"
 }
