@@ -11,7 +11,7 @@ const cacheAndInstall = async () => {
   await execScript('install.sh', [], {
     env: {
       ...process.env,
-      bin_path: direnv.installBinDir,
+      direnv_bin_path: direnv.installBinDir,
       direnv_version: direnv.version,
     },
   });
