@@ -27,5 +27,6 @@ set -euo pipefail
   echo "source $HOME/.nix-profile/share/nix-direnv/direnvrc" >> $HOME/.direnvrc
   echo "::endgroup::"
 
+  source $HOME/.nix-profile/share/nix-direnv/direnvrc
   direnv --version
 }
