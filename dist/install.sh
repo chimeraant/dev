@@ -18,6 +18,8 @@ set -euo pipefail
     echo "Aborting: Direnv version v$(direnv --version) is already installed at $(type -p direnv)"
     exit
   else
+    echo "[installer] path: $(type -p direnv)"
+    echo "[installer] version: $(direnv --version)"
     bin_path="$direnv_bin_path" \
     version="$direnv_version" \
       bash <(curl -sfL https://raw.githubusercontent.com/direnv/direnv/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh)
