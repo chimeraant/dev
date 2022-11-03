@@ -3,12 +3,10 @@
 set -euo pipefail
 
 {
-
-  nix_config="keep-derivations = true\nkeep-outputs = true"
   # Ignore GITHUB_PATH and GITHUB_ENV for local installation
   # GITHUB_PATH from the downloaded script is not added to path anyway
   # Path export is instead done using js toolkit
-  INPUT_EXTRA_NIX_CONFIG=$(sed "i$nix_config") \
+  INPUT_EXTRA_NIX_CONFIG= \
   INPUT_INSTALL_OPTIONS= \
   INPUT_INSTALL_URL="https://releases.nixos.org/nix/nix-2.11.0/install" \
   INPUT_NIX_PATH= \
