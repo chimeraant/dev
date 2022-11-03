@@ -3,9 +3,9 @@
 set -euo pipefail
 
 echo "::group::direnv allow"
-/nix/var/nix/profiles/default/bin/direnv allow
+direnv allow
 echo "::endgroup::"
 
 echo "::group::Exporting direnv environment variables to GitHub Action"
-/nix/var/nix/profiles/default/bin/direnv export gha >> "$GITHUB_ENV"
+direnv export gha >> "$GITHUB_ENV"
 echo "::endgroup::"
