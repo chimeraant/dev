@@ -18,7 +18,6 @@ set -euo pipefail
     echo "Aborting: Direnv version v$(direnv --version) is already installed at $(type -p direnv)"
   else
     bin_path="$direnv_bin_path"
-    version="$direnv_version"
     log() {
       echo "[installer] $*" >&2
     }
