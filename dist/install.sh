@@ -24,6 +24,7 @@ set -euo pipefail
 
 
   echo "::group::Debug"
+  ls "/nix/var/nix/profiles/defult/bin"
   ls "/nix/var/nix/profiles/per-user/$USER/bin"
   echo "::endgroup::"
 }
