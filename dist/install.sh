@@ -24,7 +24,13 @@ set -euo pipefail
 
 
   echo "::group::Debug"
-  ls "/nix/var/nix/profiles/defult/bin"
-  ls "/nix/var/nix/profiles/per-user/$USER/bin"
+  if [[ -z "$bin_path" ]]; then
+    log "bin_path is not set, you can set bin_path to specify the installation path"
+    log "e.g. export bin_path=/path/to/installation before installing"
+    log "looking for a writeable path from PATH environment variable"
+    for path in $(echo "$PATH" | tr ':' '\n'); do
+      echo "$path"
+    done
+  fi
   echo "::endgroup::"
 }
