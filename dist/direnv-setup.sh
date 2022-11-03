@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+echo "$GITHUB_PATH"
+
 echo "::group::direnv allow"
 direnv allow
 echo "::endgroup::"

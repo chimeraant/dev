@@ -163,7 +163,6 @@ const direnvVersion = 'v2.32.1';
 exports.direnv = {
     installBinDir: '/usr/local/bin',
     cacheKey: `${process.env['RUNNER_OS']}-direnv-${direnvVersion}`,
-    cacheDir: '/tmp/direnv-cache',
     stateKey: 'direnv-state-key',
     version: direnvVersion,
 };
