@@ -5,17 +5,16 @@
 
   outputs = { self, nixpkgs }: with nixpkgs.legacyPackages.x86_64-linux;
     let
-      stdenvMinimal = nixpkgs.stdenvNoCC.override {
-        cc = null;
-        preHook = "";
-        allowedRequisites = null;
-        initialPath = nixpkgs.lib.filter
-          (a: nixpkgs.lib.hasPrefix "coreutils" a.name)
-          nixpkgs.stdenvNoCC.initialPath;
-        extraNativeBuildInputs = [ ];
-      };
-      minimalMkShell = nixpkgs.mkShell.override {
-        stdenv = stdenvMinimal;
+      minimalMkShell = mkShell.override {
+        stdenv = stdenvNoCC.override {
+          cc = null;
+          preHook = "";
+          allowedRequisites = null;
+          initialPath = lib.filter
+            (a: lib.hasPrefix "coreutils" a.name)
+            stdenvNoCC.initialPath;
+          extraNativeBuildInputs = [ ];
+        };
       };
     in
     {
