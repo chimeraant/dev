@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+source "$HOME/.profile"
+source $HOME/.nix-profile/share/nix-direnv/direnvrc
+
 echo "::group::direnv allow"
 direnv allow
 echo "::endgroup::"
