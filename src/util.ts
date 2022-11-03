@@ -57,7 +57,7 @@ const logAndHash = async (pattern: string) => {
   for await (const file of globber.globGenerator()) {
     files.push(file);
   }
-  const hash = await glob.hashFiles(pattern);
+  const hash = await glob.hashFiles(pattern, undefined, true);
   core.info(`hashing files: ${files} => ${hash}`);
   return hash;
 };
@@ -67,7 +67,7 @@ export const getNixCache = () =>
     '/tmp/nixcache',
     'nix-store-cache-key',
     async () => {
-      const hash = await logAndHash('flake.**');
+      const hash = await logAndHash('flake.nix\nflake.lock');
       return `${nixStoreCacheKeyPrefix}${hash}`;
     },
     'nix-store-cache-restore-keys',
