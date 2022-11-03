@@ -26,7 +26,7 @@
           fi
         }
         assertEqual "nix --version" "nix (Nix) 2.11.0" || exit 1
-        pnpm install
+        [ ! -d "node_modules" ] && pnpm install
       '';
     };
   };
