@@ -31,7 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-      - run: playwright pdf google.com a.pdf
 
   release:
     timeout-minutes: 5
