@@ -18,11 +18,9 @@ set -euo pipefail
     echo "Aborting: Direnv version v$(direnv --version) is already installed at $(type -p direnv)"
     exit
   else
-    echo "$direnv_bin_path"
     export bin_path="$direnv_bin_path"
     export version="$direnv_version"
-    echo "$bin_path"
-    sudo --preserve-env  bash <(curl -sfL https://raw.githubusercontent.com/direnv/direnv/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh)
+    curl -sfL https://raw.githubusercontent.com/direnv/direnv/fe2123fc729b7a6a5954460282810dd226263c4e/install.sh | sudo --preserve-env bash
   fi
   echo "::endgroup::"
 }
