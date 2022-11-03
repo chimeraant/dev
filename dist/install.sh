@@ -83,14 +83,14 @@ set -euo pipefail
     echo "bin_path=$bin_path"
 
     if [[ -n "$version" ]]; then
-      release_id="tags/${version}"
+      release="tags/${version}"
     else
-      release_id="latest"
+      release="latest"
     fi
 
     log "looking for a download URL"
     download_url=$(
-      curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release_id" \
+      curl -fL "https://api.github.com/repos/direnv/direnv/releases/$release" \
       | grep browser_download_url \
       | cut -d '"' -f 4 \
       | grep "direnv.$kernel.$machine"
