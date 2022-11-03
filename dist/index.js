@@ -159,7 +159,7 @@ const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-sto
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
 exports.getPnpmCache = getPnpmCache;
-const direnvVersion = 'v2.32.0';
+const direnvVersion = 'v2.32.1';
 exports.direnv = {
     installBinDir: '/usr/local/bin',
     cacheKey: `${process.env['RUNNER_OS']}-direnv-${direnvVersion}`,

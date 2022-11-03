@@ -88,7 +88,7 @@ export const getPnpmCache = () =>
     [pnpmStoreCacheKeyPrefix]
   );
 
-const direnvVersion = 'v2.32.0';
+const direnvVersion = 'v2.32.1';
 
 export const direnv = {
   installBinDir: '/usr/local/bin',
