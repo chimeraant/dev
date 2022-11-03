@@ -14,6 +14,11 @@ set -euo pipefail
   bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh)
 
   echo "::group::Installing direnv"
-  curl -sfL https://direnv.net/install.sh | sudo --preserve-env bash
+  if $(type -p direnv &>/dev/null) && [[ "v$(direnv --version)" == "$direnv_version" ]] ; then
+    echo "Aborting: Direnv version v$(direnv --version) is already installed at $(type -p direnv)"
+    exit
+  else
+    curl -sfL https://direnv.net/install.sh | sudo --preserve-env bash
+  fi
   echo "::endgroup::"
 }

@@ -12,6 +12,7 @@ const cacheAndInstall = async () => {
     env: {
       ...process.env,
       bin_path: direnv.installBinDir,
+      direnv_version: direnv.version,
     },
   });
 };
