@@ -222,7 +222,7 @@ const prettyExec = async (command, args, option) => {
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
     const cmdStr = `${command} ${args?.join(' ')}`;
     core.startGroup(`"${cmdStr}" ${elapsed}s ${code}`);
-    core.error(output.stderr);
+    core.warning(output.stderr);
     core.info(output.stdout);
     core.endGroup();
     return output;
