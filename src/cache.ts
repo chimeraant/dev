@@ -61,7 +61,7 @@ export const nixCache: Cache = {
 
 export const pnpmCache: Cache = {
   path: `~/.local/share/pnpm/store/v3`,
-  patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
+  patterns: ['*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
   key: 'pnpm-store',
 };
 
@@ -72,6 +72,6 @@ export const direnvCache: Cache = {
 
 export const projectCache: Cache = {
   path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
-  patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+  patterns: ['flake.nix', 'flake.lock', '*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
   key: 'project',
 };
