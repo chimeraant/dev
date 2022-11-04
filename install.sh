@@ -3,12 +3,12 @@
 set -euo pipefail
 
 {
-  workdir=$(mktemp -d)
-  trap 'rm -rf "$workdir"' EXIT
 
   if type -p nix &>/dev/null ; then
     echo "nix is already installed at $(type -p nix). Skipping installation."
   else
+    workdir=$(mktemp -d)
+    trap 'rm -rf "$workdir"' EXIT
     printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
     sudo mkdir -p /etc/nix
     sudo chmod 0755 /etc/nix
