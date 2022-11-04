@@ -28,7 +28,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: lint-and-check-dist
     strategy:
-      concurrency: [ 2, 4, 8, 16, 32, 64, 128 ]
+      matrix:
+        concurrency: [ 2, 4, 8, 16, 32, 64, 128 ]
     steps:
       - uses: actions/checkout@v3
       - uses: ./
