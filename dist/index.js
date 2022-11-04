@@ -174,6 +174,7 @@ const allow = () => (0, exec_1.prettyExec)('direnv', ['allow']);
 const setup = async () => {
     await allow();
     await exportVariables();
+    await exportVariables();
 };
 exports.setup = setup;
 //# sourceMappingURL=direnv.js.map
