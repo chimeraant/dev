@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-export const prettyExec = async (command: string, args?: string[], option?: exec.ExecOptions) => {
+export const prettyExec = async (command: string, args?: string[]) => {
   const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
   const mark = `>>> "${cmdStr}"`;
   console.time(mark);
@@ -11,15 +11,12 @@ export const prettyExec = async (command: string, args?: string[], option?: exec
     ignoreReturnCode: true,
     listeners: {
       stdline: (s) => {
-        core.info(`[${cmdStr}][stdout] ${s}`);
-        buffers.push(`[stdout] ${s}`);
+        buffers.push(`${cmdStr} > stdout > ${s}`);
       },
       stderr: (s) => {
-        core.info(`[${cmdStr}[ [stderr] ${s}`);
-        buffers.push(`[stderr] ${s}`);
+        buffers.push(`${cmdStr} > stderr > ${s}`);
       },
     },
-    ...option,
   });
   const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
   console.timeEnd(mark);

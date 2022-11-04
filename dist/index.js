@@ -142,7 +142,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
-const prettyExec = async (command, args, option) => {
+const prettyExec = async (command, args) => {
     const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
     const mark = `>>> "${cmdStr}"`;
     console.time(mark);
@@ -152,15 +152,12 @@ const prettyExec = async (command, args, option) => {
         ignoreReturnCode: true,
         listeners: {
             stdline: (s) => {
-                core.info(`[${cmdStr}][stdout] ${s}`);
-                buffers.push(`[stdout] ${s}`);
+                buffers.push(`${cmdStr} > stdout > ${s}`);
             },
             stderr: (s) => {
-                core.info(`[${cmdStr}[ [stderr] ${s}`);
-                buffers.push(`[stderr] ${s}`);
+                buffers.push(`${cmdStr} > stderr > ${s}`);
             },
         },
-        ...option,
     });
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
     console.timeEnd(mark);
