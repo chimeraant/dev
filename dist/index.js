@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
+exports.experimentalCache = exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -77,6 +77,11 @@ exports.direnvCache = {
 exports.projectCache = {
     path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
     patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+    key: 'project',
+};
+exports.experimentalCache = {
+    path: `/nix`,
+    patterns: ['flake.nix', 'flake.lock'],
     key: 'project',
 };
 //# sourceMappingURL=cache.js.map
