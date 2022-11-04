@@ -78,7 +78,7 @@ const pnpmStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-pnpm-store-`;
 
 export const getPnpmCache = () =>
   cacheConfig(
-    '~/.local/share/pnpm/store/v3',
+    `${process.env['HOME']}/.local/share/pnpm/store/v3`,
     'pnpm-store-cache-key',
     async () => {
       const hash = await logAndHash('**/pnpm-lock.yaml');

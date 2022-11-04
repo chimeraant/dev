@@ -155,7 +155,7 @@ const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', as
 }, 'nix-store-cache-restore-keys', [nixStoreCacheKeyPrefix]);
 exports.getNixCache = getNixCache;
 const pnpmStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-pnpm-store-`;
-const getPnpmCache = () => cacheConfig('~/.local/share/pnpm/store/v3', 'pnpm-store-cache-key', async () => {
+const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', async () => {
     const hash = await logAndHash('**/pnpm-lock.yaml');
     return `${pnpmStoreCacheKeyPrefix}${hash}`;
 }, 'pnpm-store-cache-restore-keys', [pnpmStoreCacheKeyPrefix]);
