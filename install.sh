@@ -18,9 +18,6 @@ set -euo pipefail
   add_config "trusted-users = root $USER"
   add_config "experimental-features = nix-command flakes"
 
-  installer_options=(
-  )
-
   add_config "build-users-group ="
   sudo mkdir -p /etc/nix
   sudo chmod 0755 /etc/nix
@@ -42,6 +39,8 @@ set -euo pipefail
     --no-channel-add \
     --darwin-use-unencrypted-nix-store-volume \
     --nix-extra-conf-file "$workdir/nix.conf" \
+
+  . /home/runner/.nix-profile/etc/profile.d/nix.sh
 
   export version="v2.32.1"
   if $(type -p direnv &>/dev/null) && [[ "v$(direnv --version)" == "$version" ]] ; then
