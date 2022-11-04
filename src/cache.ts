@@ -58,7 +58,17 @@ export const cacheCleanup = async (
 };
 
 export const nixCache: Cache = {
-  path: ['/nix'],
+  path: [
+    '/nix/store/',
+    '/nix/var/nix/db/db.sqlite',
+    '!/nix/var/nix/db/big-lock',
+    '!/nix/var/nix/db/reserved',
+    '!/nix/var/nix/daemon-socket/socket',
+    '!/nix/var/nix/gc-socket/socket',
+    '!/nix/var/nix/gc.lock',
+    '!/nix/var/nix/userpool/30002',
+    '!/nix/var/nix/userpool/30001: Cannot open: Permission denied',
+  ],
   patterns: ['flake.nix', 'flake.lock'],
   key: 'nix-store',
 };
