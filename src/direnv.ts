@@ -18,6 +18,6 @@ const exportVariables = async () => {
 const allow = () => exec.exec('direnv', ['allow']);
 
 export const setup = async () => {
-  await exportVariables();
   await allow();
+  await exportVariables();
 };

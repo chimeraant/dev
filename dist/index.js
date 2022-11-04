@@ -109,8 +109,8 @@ const exportVariables = async () => {
 };
 const allow = () => exec.exec('direnv', ['allow']);
 const setup = async () => {
-    await exportVariables();
     await allow();
+    await exportVariables();
 };
 exports.setup = setup;
 //# sourceMappingURL=direnv.js.map
