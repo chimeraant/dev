@@ -12,7 +12,7 @@ set -euo pipefail
       sudo mkdir -p /etc/nix
       sudo chmod 0755 /etc/nix
       sudo sh -c 'printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf'
-      curl -o /etc/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
+      sudo curl -o /etc/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
     fi
     sh /etc/nix/install \
       --no-channel-add \
