@@ -9,16 +9,16 @@ const restoreNixCache = async () => {
   await restoreCache(nixCache);
 };
 
+const install = async () => {
+  await restoreCache(direnvCache);
+  await prettyExec(`${__dirname}/../install.sh`);
+};
+
 export const setup = async () => {
   // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
   core.addPath(`/nix/var/nix/profiles/default/bin`);
 
-  await Promise.all([
-    restoreCache(direnvCache),
-    prettyExec(`${__dirname}/../install.sh`),
-    restoreNixCache(),
-    restoreCache(pnpmCache),
-  ]);
+  await Promise.all([install(), restoreNixCache(), restoreCache(pnpmCache)]);
   await prettyExec('direnv', ['allow']);
   const { stdout } = await prettyExec('direnv', ['export', 'json']);
   Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
