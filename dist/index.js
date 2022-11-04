@@ -122,7 +122,7 @@ const saveNixStore = async () => {
 const savePnpmStore = async () => {
     const pnpmCache = await getPnpmCache();
     if (pnpmCache.shouldSave()) {
-        await exec.exec('pnpm store prune');
+        await exec.exec('pnpm', ['store', 'prune']);
         await pnpmCache.save();
     }
 };
