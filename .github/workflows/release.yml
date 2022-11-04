@@ -16,11 +16,12 @@ jobs:
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
-          pathsToPush: "./#devShell.x86_64-linux"
+          pathsToPush: dev-profile
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: curl -sfL https://raw.githubusercontent.com/direnv/direnv/db00133c845be3a01437b933936db5aa40977d30/install.sh | sudo --preserve-env bash
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
+      - run: nix develop --profile dev-profile
       - run: pnpm lint
       - run: pnpm build:ci
       - name: Compare the expected and actual dist/ directories
@@ -42,11 +43,12 @@ jobs:
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
-          pathsToPush: "./#devShell.x86_64-linux"
+          pathsToPush: dev-profile
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: curl -sfL https://raw.githubusercontent.com/direnv/direnv/db00133c845be3a01437b933936db5aa40977d30/install.sh | sudo --preserve-env bash
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
+      - run: nix develop --profile dev-profile
       - run: playwright pdf google.com a.pdf
 
   release:
@@ -59,11 +61,12 @@ jobs:
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
-          pathsToPush: "./#devShell.x86_64-linux"
+          pathsToPush: dev-profile
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: curl -sfL https://raw.githubusercontent.com/direnv/direnv/db00133c845be3a01437b933936db5aa40977d30/install.sh | sudo --preserve-env bash
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
+      - run: nix develop --profile dev-profile
       - run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
