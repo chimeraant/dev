@@ -93,7 +93,7 @@ exports.projectCache = {
     key: 'project',
 };
 exports.nixInstallerCache = {
-    path: `/etc/nix`,
+    path: `/tmp/nix`,
     key: 'nix-2.11.0',
 };
 //# sourceMappingURL=cache.js.map
@@ -361,8 +361,11 @@ const cache_1 = __nccwpck_require__(6175);
 const DIRENV = __importStar(__nccwpck_require__(9934));
 const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
+const setupNixInstaller = async () => {
+    await (0, cache_1.restoreCache)(cache_1.nixInstallerCache);
+};
 const install = async () => {
-    await Promise.all([(0, cache_1.restoreCache)(cache_1.direnvCache), (0, cache_1.restoreCache)(cache_1.nixInstallerCache)]);
+    await Promise.all([(0, cache_1.restoreCache)(cache_1.direnvCache), setupNixInstaller()]);
     await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
 };
 const setupNixDirenv = async () => {

@@ -85,6 +85,6 @@ export const projectCache: Cache = {
 };
 
 export const nixInstallerCache: Cache = {
-  path: `/etc/nix`,
+  path: `/tmp/nix`,
   key: 'nix-2.11.0',
 };

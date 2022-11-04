@@ -8,13 +8,15 @@ set -euo pipefail
   if $(type -p nix &>/dev/null) && [[ "nix (Nix) $(nix --version)" == "$nix_version" ]] ; then
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
-    if [[ ! -d /etc/nix ]]; then
-      sudo mkdir -p /etc/nix
-      sudo chmod 0755 /etc/nix
-      sudo sh -c 'printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf'
-      sudo curl -o /etc/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
+    sudo mkdir -p /etc/nix
+    sudo chmod 0755 /etc/nix
+    sudo sh -c 'printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf'
+
+    # cache
+    if [[ ! -d /tmp/nix ]]; then
+      curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
     fi
-    sh /etc/nix/install \
+    sh /tmp/nix/install \
       --no-channel-add \
       --nix-extra-conf-file /etc/nix/nix.conf
   fi

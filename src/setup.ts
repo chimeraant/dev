@@ -13,8 +13,12 @@ import * as DIRENV from './direnv';
 import { prettyExec } from './exec';
 import * as NIX_STORE from './nix-store';
 
+const setupNixInstaller = async () => {
+  await restoreCache(nixInstallerCache);
+};
+
 const install = async () => {
-  await Promise.all([restoreCache(direnvCache), restoreCache(nixInstallerCache)]);
+  await Promise.all([restoreCache(direnvCache), setupNixInstaller()]);
   await prettyExec(`${p.dirname(__filename)}/../install.sh`);
 };
 
