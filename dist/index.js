@@ -43,11 +43,11 @@ const hashPatters = async (conf) => conf.patterns === undefined
     ? ''
     : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 const getSaveKey = async (conf) => `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
-const restoreCache = async (conf, opts) => {
+const restoreCache = async (conf) => {
     core.info(`>>> Start: restore cache "${conf.key}"`);
     const start = performance.now();
     const saveKey = await getSaveKey(conf);
-    const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key], opts);
+    const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
     const result = saveCacheState(conf.key, restoredKey);
     const elapsed = ((performance.now() - start) / 1000).toFixed(0);
     core.info(`>>> Done: restore cache "${conf.key}". Restored: ${result} (${elapsed}s)`);
@@ -362,7 +362,7 @@ const install = async () => {
 };
 const setupNixDirenv = async () => {
     const [nixCacheExists] = await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.nixCache, { downloadConcurrency: 64 }),
+        (0, cache_1.restoreCache)(cache_1.nixCache),
         install(),
     ]);
     if (nixCacheExists) {
