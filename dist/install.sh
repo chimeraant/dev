@@ -5,9 +5,6 @@ set -euo pipefail
 {
 
   nix_version="2.11.0"
-  echo nix
-  type -p nix
-  echo nixo
   if $(type -p nix &>/dev/null) && [[ $(nix --version) == "nix (Nix) $nix_version" ]] ; then
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
