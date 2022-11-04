@@ -167,15 +167,8 @@ exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec_1 = __nccwpck_require__(9390);
 const exportVariables = async () => {
-    let outputBuffer = '';
-    await (0, exec_1.prettyExec)('direnv', ['export', 'json'], {
-        listeners: {
-            stdout: (data) => {
-                outputBuffer += data.toString();
-            },
-        },
-    });
-    Object.entries(JSON.parse(outputBuffer)).forEach(([key, value]) => core.exportVariable(key, value));
+    const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json']);
+    Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
 };
 const allow = () => (0, exec_1.prettyExec)('direnv', ['allow']);
 const setup = async () => {
@@ -225,7 +218,7 @@ const prettyExec = async (command, args, option) => {
         silent: true,
         ...option,
     });
-    const elapsed = process.hrtime(start)[1] / 1000000;
+    const elapsed = process.hrtime(start)[1] / 100000;
     core.startGroup(`"${command} ${args?.join(' ')}" ${elapsed}s code: ${output.exitCode}`);
     core.error(output.stderr);
     core.info(output.stdout);
