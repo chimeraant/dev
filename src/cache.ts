@@ -58,7 +58,7 @@ export const cacheCleanup = async (
 };
 
 export const nixCache: Cache = {
-  path: ['/nix/store/', '/nix/var/nix/db/db.sqlite'],
+  path: ['/nix'],
   patterns: ['flake.nix', 'flake.lock'],
   key: 'nix-store',
 };
