@@ -40,8 +40,6 @@ set -euo pipefail
     --darwin-use-unencrypted-nix-store-volume \
     --nix-extra-conf-file "$workdir/nix.conf" \
 
-  . /home/runner/.nix-profile/etc/profile.d/nix.sh
-
   export version="v2.32.1"
   if $(type -p direnv &>/dev/null) && [[ "v$(direnv --version)" == "$version" ]] ; then
     echo "direnv $version is already installed at $(type -p direnv). Skipping installation."
