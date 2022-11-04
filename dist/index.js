@@ -34,10 +34,13 @@ const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const util_1 = __nccwpck_require__(3175);
-const cacheAndInstall = async () => {
+const restoreDirenvCache = async () => {
     const restoredKey = await cache.restoreCache([`${util_1.direnv.installBinDir}/direnv`], util_1.direnv.cacheKey);
     const isDirenvCacheHit = `${restoredKey !== undefined}`;
     core.saveState(util_1.direnv.stateKey, isDirenvCacheHit);
+};
+const installNixAndDirenv = async () => {
+    await restoreDirenvCache();
     await (0, util_1.execScript)('install.sh', [], {
         env: {
             ...process.env,
@@ -49,9 +52,9 @@ const cacheAndInstall = async () => {
 const setupNixCache = async () => {
     const nixCache = await (0, util_1.getNixCache)();
     const restoredCacheKey = await nixCache.restore();
-    return [nixCache, restoredCacheKey];
+    return [nixCache.path, restoredCacheKey];
 };
-const exportEnvrc = async () => {
+const direnvExport = async () => {
     let outputBuffer = '';
     await exec.exec('direnv', ['export', 'json'], {
         listeners: {
@@ -63,18 +66,20 @@ const exportEnvrc = async () => {
     Object.entries(JSON.parse(outputBuffer)).forEach(([key, value]) => core.exportVariable(key, value));
 };
 const setupNixDirenv = async () => {
-    const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
-    if (restoredCacheKey !== undefined) {
+    const [[nixCachePath, restoredNixStoreCacheKey]] = await Promise.all([
+        setupNixCache(),
+        installNixAndDirenv(),
+    ]);
+    const nixStoreCacheExists = restoredNixStoreCacheKey !== undefined;
+    if (nixStoreCacheExists) {
         await exec.exec('nix', [
             'copy',
             '--no-check-sigs',
             '--from',
-            nixCache.path,
+            nixCachePath,
             './#devShell.x86_64-linux',
         ]);
     }
-    await exec.exec('direnv', ['allow']);
-    await exportEnvrc();
 };
 const pnpmRestore = async () => {
     const pnpmCache = await (0, util_1.getPnpmCache)();
@@ -86,6 +91,8 @@ const run = async () => {
         core.addPath('/nix/var/nix/profiles/default/bin');
         core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/bin`);
         await Promise.all([setupNixDirenv(), pnpmRestore()]);
+        await exec.exec('direnv', ['allow']);
+        await direnvExport();
     }
     catch (error) {
         if (error instanceof Error) {

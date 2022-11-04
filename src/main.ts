@@ -4,11 +4,14 @@ import * as exec from '@actions/exec';
 
 import { direnv, execScript, getNixCache, getPnpmCache } from './util';
 
-const cacheAndInstall = async () => {
+const restoreDirenvCache = async () => {
   const restoredKey = await cache.restoreCache([`${direnv.installBinDir}/direnv`], direnv.cacheKey);
   const isDirenvCacheHit = `${restoredKey !== undefined}`;
   core.saveState(direnv.stateKey, isDirenvCacheHit);
+};
 
+const installNixAndDirenv = async () => {
+  await restoreDirenvCache();
   await execScript('install.sh', [], {
     env: {
       ...process.env,
@@ -21,10 +24,10 @@ const cacheAndInstall = async () => {
 const setupNixCache = async () => {
   const nixCache = await getNixCache();
   const restoredCacheKey = await nixCache.restore();
-  return [nixCache, restoredCacheKey] as const;
+  return [nixCache.path, restoredCacheKey] as const;
 };
 
-const exportEnvrc = async () => {
+const direnvExport = async () => {
   let outputBuffer = '';
   await exec.exec('direnv', ['export', 'json'], {
     listeners: {
@@ -39,20 +42,21 @@ const exportEnvrc = async () => {
 };
 
 const setupNixDirenv = async () => {
-  const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
+  const [[nixCachePath, restoredNixStoreCacheKey]] = await Promise.all([
+    setupNixCache(),
+    installNixAndDirenv(),
+  ]);
 
-  if (restoredCacheKey !== undefined) {
+  const nixStoreCacheExists = restoredNixStoreCacheKey !== undefined;
+  if (nixStoreCacheExists) {
     await exec.exec('nix', [
       'copy',
       '--no-check-sigs',
       '--from',
-      nixCache.path,
+      nixCachePath,
       './#devShell.x86_64-linux',
     ]);
   }
-
-  await exec.exec('direnv', ['allow']);
-  await exportEnvrc();
 };
 
 const pnpmRestore = async () => {
@@ -67,6 +71,8 @@ const run = async () => {
     core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/bin`);
 
     await Promise.all([setupNixDirenv(), pnpmRestore()]);
+    await exec.exec('direnv', ['allow']);
+    await direnvExport();
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message);
