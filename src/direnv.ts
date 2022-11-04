@@ -8,7 +8,7 @@ const exportVariables = async () => {
 };
 
 export const setup = async () => {
-  await prettyExec('nix', ['develop', '--unpack']);
+  await prettyExec('nix', ['develop']);
   await prettyExec('direnv', ['allow']);
   await exportVariables();
 };
