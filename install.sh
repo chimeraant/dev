@@ -12,8 +12,8 @@ set -euo pipefail
     workdir=$(mktemp -d)
     trap 'rm -rf "$workdir"' EXIT
     printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
-    sh <(curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") --help
-    sh <(curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
+    sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") --help
+    sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
       --no-channel-add \
       --daemon \
       --daemon-user-count "$(python3 -c 'import multiprocessing as mp; print(mp.cpu_count() * 2)')" \
