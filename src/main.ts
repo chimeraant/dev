@@ -28,7 +28,7 @@ const setupNixDirenv = async () => {
   const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
 
   if (restoredCacheKey !== undefined) {
-    await execScript('nix', [
+    await exec.exec('nix', [
       'copy',
       '--no-check-sigs',
       '--from',

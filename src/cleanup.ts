@@ -2,14 +2,14 @@ import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-import { direnv, execScript, getNixCache, getPnpmCache } from './util';
+import { direnv, getNixCache, getPnpmCache } from './util';
 
 const restoreNixStore = async () => {
   const nixCache = await getNixCache();
   if (nixCache.shouldSave()) {
-    await execScript('nix', ['store', 'gc']);
-    await execScript('nix', ['store', 'optimise']);
-    await execScript('nix', [
+    await exec.exec('nix', ['store', 'gc']);
+    await exec.exec('nix', ['store', 'optimise']);
+    await exec.exec('nix', [
       'copy',
       '--no-check-sigs',
       '--to',
