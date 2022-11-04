@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: ./
+      - uses: cachix/install-nix-action@v17
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
@@ -37,7 +37,7 @@ jobs:
     needs: lint-and-check-dist
     steps:
       - uses: actions/checkout@v3
-      - uses: ./
+      - uses: cachix/install-nix-action@v17
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./
+      - uses: cachix/install-nix-action@v17
       - uses: cachix/cachix-action@v11
         with:
           name: aabccd021nixgithubactionstest
