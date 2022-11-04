@@ -353,7 +353,11 @@ const install = async () => {
     await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
 };
 const setupNixDirenv = async () => {
-    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
+    const useCache = core.getInput('use_cache');
+    const [nixCacheExists] = await Promise.all([
+        useCache === 'false' ? false : (0, cache_1.restoreCache)(cache_1.nixCache),
+        install(),
+    ]);
     if (nixCacheExists) {
         await NIX_STORE.importFrom(cache_1.nixCache.path);
     }

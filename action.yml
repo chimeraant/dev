@@ -6,6 +6,8 @@ runs:
   main: 'dist/index.js'
   post: 'dist/index.js'
   post-if: 'success()'
+inputs:
+  use_cache:
 branding:
   icon: 'briefcase'
   color: 'green'

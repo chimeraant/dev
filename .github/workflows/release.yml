@@ -9,10 +9,28 @@ jobs:
   lint-and-check-dist:
     timeout-minutes: 5
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: ./
+      - run: pnpm lint
+      - run: pnpm build:ci
+      - name: Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
+        id: diff
+
+  lint-and-check-dist-no-cache:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          use_cache: false
       - run: pnpm lint
       - run: pnpm build:ci
       - name: Compare the expected and actual dist/ directories
@@ -62,6 +80,17 @@ jobs:
       - uses: ./
       - run: playwright pdf google.com a.pdf
 
+  test-no-cache:
+    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+    needs: lint-and-check-dist-no-cache
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          use_cache: false
+      - run: playwright pdf google.com a.pdf
+
   test-cachix:
     timeout-minutes: 5
     runs-on: ubuntu-22.04
@@ -84,7 +113,7 @@ jobs:
 
   release:
     timeout-minutes: 5
-    needs: [ test, test-cachix ]
+    needs: [ test, test-cachix, test-no-cache ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
