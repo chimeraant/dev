@@ -1,5 +1,6 @@
 import * as cache from '@actions/cache';
 import * as core from '@actions/core';
+import * as exec from '@actions/exec';
 
 import { direnv, execScript, getNixCache, getPnpmCache } from './util';
 
@@ -30,6 +31,7 @@ const setupNixDirenv = async () => {
     await execScript('import.sh', [nixCache.path]);
   }
 
+  await exec.exec('direnv', ['allow']);
   await execScript('direnv-setup.sh');
 };
 

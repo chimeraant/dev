@@ -32,6 +32,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
+const exec = __importStar(__nccwpck_require__(5082));
 const util_1 = __nccwpck_require__(3175);
 const cacheAndInstall = async () => {
     const restoredKey = await cache.restoreCache([`${util_1.direnv.installBinDir}/direnv`], util_1.direnv.cacheKey);
@@ -55,6 +56,7 @@ const setupNixDirenv = async () => {
     if (restoredCacheKey !== undefined) {
         await (0, util_1.execScript)('import.sh', [nixCache.path]);
     }
+    await exec.exec('direnv', ['allow']);
     await (0, util_1.execScript)('direnv-setup.sh');
 };
 const run = async () => {
