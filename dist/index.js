@@ -70,7 +70,17 @@ const cacheCleanup = async (conf, hooks) => {
 };
 exports.cacheCleanup = cacheCleanup;
 exports.nixCache = {
-    path: ['/nix', '!**/big-lock', '!**/reserved', '!**/socket', '!**/gc.lock', '!**/userpool/*'],
+    path: [
+        '/nix/store/**',
+        '/nix/var/nix/*/*',
+        '/nix/var/nix/db/*',
+        '/nix/var/nix/db/*/**',
+        '!/nix/var/nix/daemon-socket/socket',
+        '!/nix/var/nix/userpool/*',
+        '!/nix/var/nix/gc.lock',
+        '!/nix/var/nix/db/big-lock',
+        '!/nix/var/nix/db/reserved',
+    ],
     patterns: ['flake.nix', 'flake.lock'],
     key: 'nix-store',
 };
