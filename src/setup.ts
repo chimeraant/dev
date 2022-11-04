@@ -12,7 +12,7 @@ export const install = async () => {
 
 const setupNixDirenv = async () => {
   await prettyExec('sudo', ['mkdir', '-p', '--verbose', '/nix']);
-  await prettyExec('sudo', ['chown', '--verbose', '"$USER:"', '/nix']);
+  await prettyExec('sudo', ['chown', '--verbose', `"${process.env['USER']}:"`, '/nix']);
   const ultraCacheExists = await restoreCache(ultraCache);
   if (!ultraCacheExists) {
     await prettyExec('sudo', ['rm', '-rf', '/nix']);
