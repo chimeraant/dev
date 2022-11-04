@@ -114,8 +114,9 @@ const glob = __importStar(__nccwpck_require__(1770));
 const path = __importStar(__nccwpck_require__(1017));
 const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 exports.execScript = execScript;
-const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : await defaultStr();
-const cacheConfig = async (cachePath, keyInput, defaultKeyInput, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
+const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : defaultStr;
+const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
+    const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern, undefined, true));
     const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
     const restoreKeys = await nonEmptyStrOrElse(core.getInput(restoreKeyInput), defaultRestoreKeyInput);
     return {
@@ -133,17 +134,9 @@ const cacheConfig = async (cachePath, keyInput, defaultKeyInput, restoreKeyInput
         save: () => cache.saveCache([cachePath], saveKey),
     };
 };
-const nixStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-nix-store-`;
-const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', async () => {
-    const hash = await glob.hashFiles('flake.nix\nflake.lock', undefined, true);
-    return `${nixStoreCacheKeyPrefix}${hash}`;
-}, 'nix-store-cache-restore-keys', async () => nixStoreCacheKeyPrefix, 'nix-cache-state');
+const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', 'flake.nix\nflake.lock', 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
 exports.getNixCache = getNixCache;
-const pnpmStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-pnpm-store-`;
-const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', async () => {
-    const hash = await glob.hashFiles('!(.direnv)**/pnpm-lock.yaml', undefined, true);
-    return `${pnpmStoreCacheKeyPrefix}${hash}`;
-}, 'pnpm-store-cache-restore-keys', async () => pnpmStoreCacheKeyPrefix, 'nix-cache-state');
+const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', '!(.direnv)**/pnpm-lock.yaml', 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
 exports.getPnpmCache = getPnpmCache;
 const direnvVersion = 'v2.32.1';
 exports.direnv = {

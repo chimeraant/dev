@@ -7,17 +7,18 @@ import * as path from 'path';
 export const execScript = (scriptName: string, args?: string[], execOptions?: exec.ExecOptions) =>
   exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 
-const nonEmptyStrOrElse = async (str: string, defaultStr: () => Promise<string>) =>
-  str !== '' ? str : await defaultStr();
+const nonEmptyStrOrElse = async (str: string, defaultStr: string) =>
+  str !== '' ? str : defaultStr;
 
 const cacheConfig = async (
   cachePath: string,
   keyInput: string,
-  defaultKeyInput: () => Promise<string>,
+  pattern: string,
   restoreKeyInput: string,
-  defaultRestoreKeyInput: () => Promise<string>,
+  defaultRestoreKeyInput: string,
   stateId: string
 ) => {
+  const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern, undefined, true));
   const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
   const restoreKeys = await nonEmptyStrOrElse(
     core.getInput(restoreKeyInput),
@@ -39,33 +40,23 @@ const cacheConfig = async (
   };
 };
 
-const nixStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-nix-store-`;
-
 export const getNixCache = () =>
   cacheConfig(
     '/tmp/nixcache',
     'nix-store-cache-key',
-    async () => {
-      const hash = await glob.hashFiles('flake.nix\nflake.lock', undefined, true);
-      return `${nixStoreCacheKeyPrefix}${hash}`;
-    },
+    'flake.nix\nflake.lock',
     'nix-store-cache-restore-keys',
-    async () => nixStoreCacheKeyPrefix,
+    `${process.env['RUNNER_OS']}-nix-store-`,
     'nix-cache-state'
   );
-
-const pnpmStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-pnpm-store-`;
 
 export const getPnpmCache = () =>
   cacheConfig(
     `${process.env['HOME']}/.local/share/pnpm/store/v3`,
     'pnpm-store-cache-key',
-    async () => {
-      const hash = await glob.hashFiles('!(.direnv)**/pnpm-lock.yaml', undefined, true);
-      return `${pnpmStoreCacheKeyPrefix}${hash}`;
-    },
+    '!(.direnv)**/pnpm-lock.yaml',
     'pnpm-store-cache-restore-keys',
-    async () => pnpmStoreCacheKeyPrefix,
+    `${process.env['RUNNER_OS']}-pnpm-store-`,
     'nix-cache-state'
   );
 
