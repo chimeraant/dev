@@ -1,5 +1,4 @@
 import * as core from '@actions/core';
-import * as p from 'path';
 
 import { direnvCache, nixCache, pnpmCache, projectCache, restoreCache } from './cache';
 import * as DIRENV from './direnv';
@@ -8,7 +7,7 @@ import * as NIX_STORE from './nix-store';
 
 const install = async () => {
   await restoreCache(direnvCache);
-  await prettyExec(`${p.dirname(__filename)}/../install.sh`);
+  await prettyExec(`${__dirname}/../install.sh`);
 };
 
 const setupNixDirenv = async () => {

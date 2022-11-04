@@ -343,14 +343,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
-const p = __importStar(__nccwpck_require__(1017));
 const cache_1 = __nccwpck_require__(6175);
 const DIRENV = __importStar(__nccwpck_require__(9934));
 const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
 const install = async () => {
     await (0, cache_1.restoreCache)(cache_1.direnvCache);
-    await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
+    await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
 };
 const setupNixDirenv = async () => {
     const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
