@@ -74,6 +74,7 @@ exports.ultraCache = {
         `/nix/var/nix/profiles/per-user/${process.env['USER']}/profile/bin`,
         '/nix/var/nix/profiles/default/bin/',
         '/nix/var/nix/profiles/per-user/root/channels',
+        '/nix/var/nix/db/db.sqlite',
     ],
     patterns: ['flake.nix', 'flake.lock'],
     key: 'ultra',
