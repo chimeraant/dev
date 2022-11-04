@@ -1,15 +1,6 @@
 name: 'Chimera Ant Development Environment'
 description: "Chimera Ant's development environment"
 author: 'Chimera Ant'
-inputs:
-  nix-store-cache-key:
-    required: false
-  nix-store-cache-restore-keys:
-    required: false
-  pnpm-store-cache-key:
-    required: false
-  pnpm-store-cache-restore-keys:
-    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
