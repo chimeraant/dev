@@ -300,10 +300,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.exportTo = exports.importFrom = void 0;
 const exec_1 = __nccwpck_require__(9390);
 const devShellPath = './#devShell.x86_64-linux';
-const importFrom = async (_nixCachePath) => {
-    await (0, exec_1.prettyExec)('sudo', ['chmod', '-R', '777', '/nix']);
-    await (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', '/', '--no-check-sigs']);
-};
+const importFrom = (_nixCachePath) => (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', '/', '--no-check-sigs']);
 exports.importFrom = importFrom;
 const exportTo = async (_nixCachePath) => {
     await (0, exec_1.prettyExec)('nix', ['store', 'gc']);
