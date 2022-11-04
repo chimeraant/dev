@@ -57,7 +57,7 @@ const setupNixDirenv = async () => {
         await (0, util_1.execScript)('import.sh', [nixCache.path]);
     }
     await exec.exec('direnv', ['allow']);
-    await (0, util_1.execScript)('direnv-setup.sh');
+    await exec.exec('direnv export gha >> "$GITHUB_ENV"');
 };
 const run = async () => {
     try {

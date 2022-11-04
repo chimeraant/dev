@@ -32,7 +32,7 @@ const setupNixDirenv = async () => {
   }
 
   await exec.exec('direnv', ['allow']);
-  await execScript('direnv-setup.sh');
+  await exec.exec('direnv export gha >> "$GITHUB_ENV"');
 };
 
 const run = async () => {
