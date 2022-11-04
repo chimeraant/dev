@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.experimentalCache = exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
+exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -79,11 +79,6 @@ exports.projectCache = {
     patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
     key: 'project',
 };
-exports.experimentalCache = {
-    path: `/nix`,
-    patterns: ['flake.nix', 'flake.lock'],
-    key: 'experimental',
-};
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
@@ -131,7 +126,6 @@ const nixCacheCleanup = async () => {
         await NIX_STORE.exportTo(cache_1.nixCache.path);
         await (0, cache_1.saveCache)(cache_1.nixCache);
     }
-    await simpleCleanup(cache_1.experimentalCache);
 };
 const pnpmCacheCleanup = async () => {
     if (await (0, cache_1.shouldSaveCache)(cache_1.pnpmCache)) {
@@ -367,11 +361,7 @@ const install = async () => {
     await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
 };
 const setupNixDirenv = async () => {
-    const [nixCacheExists] = await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.nixCache),
-        (0, cache_1.restoreCache)(cache_1.experimentalCache),
-        install(),
-    ]);
+    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
     if (nixCacheExists) {
         await NIX_STORE.importFrom(cache_1.nixCache.path);
     }

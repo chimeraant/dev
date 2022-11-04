@@ -1,7 +1,6 @@
 import {
   Cache,
   direnvCache,
-  experimentalCache,
   nixCache,
   pnpmCache,
   projectCache,
@@ -22,7 +21,6 @@ const nixCacheCleanup = async () => {
     await NIX_STORE.exportTo(nixCache.path);
     await saveCache(nixCache);
   }
-  await simpleCleanup(experimentalCache);
 };
 
 const pnpmCacheCleanup = async () => {
