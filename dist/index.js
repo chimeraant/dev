@@ -300,12 +300,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.exportTo = exports.importFrom = void 0;
 const exec_1 = __nccwpck_require__(9390);
 const devShellPath = './#devShell.x86_64-linux';
-const importFrom = (nixCachePath) => (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', nixCachePath, '--no-check-sigs']);
+const importFrom = (nixCachePath) => (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', `file://${nixCachePath}`, '--no-check-sigs']);
 exports.importFrom = importFrom;
 const exportTo = async (nixCachePath) => {
     await (0, exec_1.prettyExec)('nix', ['store', 'gc']);
     await (0, exec_1.prettyExec)('nix', ['store', 'optimise']);
-    await (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--to', nixCachePath, '--no-check-sigs']);
+    await (0, exec_1.prettyExec)('nix', [
+        'copy',
+        devShellPath,
+        '--to',
+        `file://${nixCachePath}`,
+        '--no-check-sigs',
+    ]);
 };
 exports.exportTo = exportTo;
 //# sourceMappingURL=nix-store.js.map
