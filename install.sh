@@ -9,14 +9,14 @@ set -euo pipefail
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
     # Create a temporary workdir
-    workdir=$(mktemp -d)
-    trap 'rm -rf "$workdir"' EXIT
-    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
+    nix_conf=$(mktemp)
+    trap 'rm "$nix_conf"' EXIT
+    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$nix_conf"
     sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
       --no-channel-add \
       --daemon \
       --daemon-user-count "$(python3 -c 'import multiprocessing as mp; print(mp.cpu_count() * 2)')" \
-      --nix-extra-conf-file "$workdir/nix.conf"
+      --nix-extra-conf-file "$nix_conf"
   fi
 
   export version="v2.32.1"
