@@ -65,5 +65,5 @@ export const projectCache: Cache = {
 export const experimentalCache: Cache = {
   path: `/nix`,
   patterns: ['flake.nix', 'flake.lock'],
-  key: 'project',
+  key: 'experimental',
 };

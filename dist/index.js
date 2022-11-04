@@ -82,7 +82,7 @@ exports.projectCache = {
 exports.experimentalCache = {
     path: `/nix`,
     patterns: ['flake.nix', 'flake.lock'],
-    key: 'project',
+    key: 'experimental',
 };
 //# sourceMappingURL=cache.js.map
 
