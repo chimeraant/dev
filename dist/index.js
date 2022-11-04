@@ -108,8 +108,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.cleanup = void 0;
-const exec = __importStar(__nccwpck_require__(5082));
 const cache_1 = __nccwpck_require__(6175);
+const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
 const nixCacheCleanup = async () => {
     if (await (0, cache_1.shouldSaveCache)(cache_1.nixCache)) {
@@ -119,7 +119,7 @@ const nixCacheCleanup = async () => {
 };
 const pnpmCacheCleanup = async () => {
     if (await (0, cache_1.shouldSaveCache)(cache_1.pnpmCache)) {
-        await exec.exec('pnpm', ['store', 'prune']);
+        await (0, exec_1.prettyExec)('pnpm', ['store', 'prune']);
         await (0, cache_1.saveCache)(cache_1.pnpmCache);
     }
 };
@@ -165,10 +165,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
-const exec = __importStar(__nccwpck_require__(5082));
+const exec_1 = __nccwpck_require__(9390);
 const exportVariables = async () => {
     let outputBuffer = '';
-    await exec.exec('direnv', ['export', 'json'], {
+    await (0, exec_1.prettyExec)('direnv', ['export', 'json'], {
         listeners: {
             stdout: (data) => {
                 outputBuffer += data.toString();
@@ -177,13 +177,63 @@ const exportVariables = async () => {
     });
     Object.entries(JSON.parse(outputBuffer)).forEach(([key, value]) => core.exportVariable(key, value));
 };
-const allow = () => exec.exec('direnv', ['allow']);
+const allow = () => (0, exec_1.prettyExec)('direnv', ['allow']);
 const setup = async () => {
     await allow();
     await exportVariables();
 };
 exports.setup = setup;
 //# sourceMappingURL=direnv.js.map
+
+/***/ }),
+
+/***/ 9390:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.prettyExec = void 0;
+const core = __importStar(__nccwpck_require__(7954));
+const exec = __importStar(__nccwpck_require__(5082));
+const prettyExec = async (command, args, option) => {
+    const start = process.hrtime();
+    const output = await exec.getExecOutput(command, args, {
+        silent: true,
+        ...option,
+    });
+    const elapsed = process.hrtime(start)[1] / 1000000000;
+    core.startGroup(`${command} ${args?.join(' ')} exits with code ${output.exitCode} (${elapsed}s)`);
+    core.error(output.stderr);
+    core.info(output.stdout);
+    core.endGroup();
+    return output;
+};
+exports.prettyExec = prettyExec;
+//# sourceMappingURL=exec.js.map
 
 /***/ }),
 
@@ -239,43 +289,20 @@ run();
 /***/ }),
 
 /***/ 7319:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.exportTo = exports.importFrom = void 0;
-const exec = __importStar(__nccwpck_require__(5082));
+const exec_1 = __nccwpck_require__(9390);
 const devShellPath = './#devShell.x86_64-linux';
-const importFrom = (nixCachePath) => exec.exec('nix', ['copy', devShellPath, '--from', nixCachePath, '--no-check-sigs']);
+const importFrom = (nixCachePath) => (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', nixCachePath, '--no-check-sigs']);
 exports.importFrom = importFrom;
 const exportTo = async (nixCachePath) => {
-    await exec.exec('nix', ['store', 'gc']);
-    await exec.exec('nix', ['store', 'optimise']);
-    await exec.exec('nix', ['copy', devShellPath, '--to', nixCachePath, '--no-check-sigs']);
+    await (0, exec_1.prettyExec)('nix', ['store', 'gc']);
+    await (0, exec_1.prettyExec)('nix', ['store', 'optimise']);
+    await (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--to', nixCachePath, '--no-check-sigs']);
 };
 exports.exportTo = exportTo;
 //# sourceMappingURL=nix-store.js.map
@@ -313,14 +340,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
-const exec = __importStar(__nccwpck_require__(5082));
 const p = __importStar(__nccwpck_require__(1017));
 const cache_1 = __nccwpck_require__(6175);
 const DIRENV = __importStar(__nccwpck_require__(9934));
+const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
 const install = async () => {
     await (0, cache_1.restoreCache)(cache_1.direnvCache);
-    await exec.exec(`${p.dirname(__filename)}/../install.sh`);
+    await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
 };
 const setupNixDirenv = async () => {
     const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);

@@ -1,9 +1,10 @@
 import * as core from '@actions/core';
-import * as exec from '@actions/exec';
+
+import { prettyExec } from './exec';
 
 const exportVariables = async () => {
   let outputBuffer = '';
-  await exec.exec('direnv', ['export', 'json'], {
+  await prettyExec('direnv', ['export', 'json'], {
     listeners: {
       stdout: (data) => {
         outputBuffer += data.toString();
@@ -15,7 +16,7 @@ const exportVariables = async () => {
   );
 };
 
-const allow = () => exec.exec('direnv', ['allow']);
+const allow = () => prettyExec('direnv', ['allow']);
 
 export const setup = async () => {
   await allow();

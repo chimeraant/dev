@@ -1,6 +1,5 @@
-import * as exec from '@actions/exec';
-
 import { direnvCache, nixCache, pnpmCache, saveCache, shouldSaveCache } from './cache';
+import { prettyExec } from './exec';
 import * as NIX_STORE from './nix-store';
 
 const nixCacheCleanup = async () => {
@@ -12,7 +11,7 @@ const nixCacheCleanup = async () => {
 
 const pnpmCacheCleanup = async () => {
   if (await shouldSaveCache(pnpmCache)) {
-    await exec.exec('pnpm', ['store', 'prune']);
+    await prettyExec('pnpm', ['store', 'prune']);
     await saveCache(pnpmCache);
   }
 };
