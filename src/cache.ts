@@ -2,6 +2,8 @@ import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 
+import { timeDone, timeStart } from './time';
+
 const saveCacheState = (stateId: string, restoredKey: string | undefined) => {
   core.saveState(stateId, restoredKey);
   const isCacheExists = restoredKey !== undefined;
@@ -24,13 +26,13 @@ const restoreKey = ({ key }: Cache) => `${process.env['RUNNER_OS']}-${key}`;
 const getSaveKey = async (conf: Cache) => `${restoreKey(conf)}${await hashPatters(conf)}`;
 
 export const restoreCache = async (conf: Cache) => {
-  console.time(`>>> restore cache "${conf.key}"`);
+  timeStart(`restore cache "${conf.key}"`);
 
   const saveKey = await getSaveKey(conf);
   const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)]);
   const result = saveCacheState(conf.key, restoredKey);
 
-  console.timeEnd(`>>> restore cache "${conf.key}"`);
+  timeDone(`restore cache "${conf.key}"`);
   return result;
 };
 
@@ -38,17 +40,17 @@ export const cacheCleanup = async (
   conf: Cache,
   hooks?: { runBeforeSave?: () => Promise<unknown> }
 ) => {
-  console.time(`>>> should save cache "${conf.key}"`);
+  timeStart(`should save cache "${conf.key}"`);
   const restoredKey = core.getState(conf.key);
   const saveKey = await getSaveKey(conf);
   const isShouldSave = saveKey !== restoredKey;
-  console.timeEnd(`>>> should save cache "${conf.key}"`);
+  timeDone(`should save cache "${conf.key}"`);
 
   if (isShouldSave) {
     await hooks?.runBeforeSave?.();
-    console.time(`>>> save cache "${conf.key}"`);
+    timeStart(`save cache "${conf.key}"`);
     await cache.saveCache(conf.path, saveKey);
-    console.timeEnd(`>>> save cache "${conf.key}"`);
+    timeDone(`save cache "${conf.key}"`);
   }
 
   return isShouldSave;

@@ -34,6 +34,7 @@ exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.cacheCleanu
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
+const time_1 = __nccwpck_require__(873);
 const saveCacheState = (stateId, restoredKey) => {
     core.saveState(stateId, restoredKey);
     const isCacheExists = restoredKey !== undefined;
@@ -45,25 +46,25 @@ const hashPatters = async (conf) => conf.patterns === undefined
 const restoreKey = ({ key }) => `${process.env['RUNNER_OS']}-${key}`;
 const getSaveKey = async (conf) => `${restoreKey(conf)}${await hashPatters(conf)}`;
 const restoreCache = async (conf) => {
-    console.time(`>>> restore cache "${conf.key}"`);
+    (0, time_1.timeStart)(`restore cache "${conf.key}"`);
     const saveKey = await getSaveKey(conf);
     const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)]);
     const result = saveCacheState(conf.key, restoredKey);
-    console.timeEnd(`>>> restore cache "${conf.key}"`);
+    (0, time_1.timeDone)(`restore cache "${conf.key}"`);
     return result;
 };
 exports.restoreCache = restoreCache;
 const cacheCleanup = async (conf, hooks) => {
-    console.time(`>>> should save cache "${conf.key}"`);
+    (0, time_1.timeStart)(`should save cache "${conf.key}"`);
     const restoredKey = core.getState(conf.key);
     const saveKey = await getSaveKey(conf);
     const isShouldSave = saveKey !== restoredKey;
-    console.timeEnd(`>>> should save cache "${conf.key}"`);
+    (0, time_1.timeDone)(`should save cache "${conf.key}"`);
     if (isShouldSave) {
         await hooks?.runBeforeSave?.();
-        console.time(`>>> save cache "${conf.key}"`);
+        (0, time_1.timeStart)(`save cache "${conf.key}"`);
         await cache.saveCache(conf.path, saveKey);
-        console.timeEnd(`>>> save cache "${conf.key}"`);
+        (0, time_1.timeDone)(`save cache "${conf.key}"`);
     }
     return isShouldSave;
 };
@@ -142,10 +143,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
+const time_1 = __nccwpck_require__(873);
 const prettyExec = async (command, args) => {
     const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
-    const mark = `>>> "${cmdStr}"`;
-    console.time(mark);
+    (0, time_1.timeStart)(cmdStr);
     const buffers = [];
     const output = await exec.getExecOutput(command, args, {
         silent: true,
@@ -160,8 +161,8 @@ const prettyExec = async (command, args) => {
         },
     });
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-    console.timeEnd(mark);
-    core.startGroup(mark);
+    (0, time_1.timeDone)(cmdStr);
+    core.startGroup(cmdStr);
     buffers.forEach(core.info);
     core.endGroup();
     if (output.exitCode !== 0) {
@@ -281,6 +282,21 @@ const setup = async () => {
 };
 exports.setup = setup;
 //# sourceMappingURL=setup.js.map
+
+/***/ }),
+
+/***/ 873:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.timeDone = exports.timeStart = void 0;
+const timeStart = (name) => console.time(`##[time] ${name}`);
+exports.timeStart = timeStart;
+const timeDone = (name) => console.timeEnd(`##[time] ${name}`);
+exports.timeDone = timeDone;
+//# sourceMappingURL=time.js.map
 
 /***/ }),
 

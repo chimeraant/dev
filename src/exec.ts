@@ -1,10 +1,11 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
+import { timeDone, timeStart } from './time';
+
 export const prettyExec = async (command: string, args?: string[]) => {
   const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
-  const mark = `>>> "${cmdStr}"`;
-  console.time(mark);
+  timeStart(cmdStr);
   const buffers: string[] = [];
   const output = await exec.getExecOutput(command, args, {
     silent: true,
@@ -19,8 +20,8 @@ export const prettyExec = async (command: string, args?: string[]) => {
     },
   });
   const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-  console.timeEnd(mark);
-  core.startGroup(mark);
+  timeDone(cmdStr);
+  core.startGroup(cmdStr);
   buffers.forEach(core.info);
   core.endGroup();
   if (output.exitCode !== 0) {
