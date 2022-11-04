@@ -1,13 +1,20 @@
 import * as core from '@actions/core';
 import * as p from 'path';
 
-import { direnvCache, nixCache, pnpmCache, projectCache, restoreCache } from './cache';
+import {
+  direnvCache,
+  nixCache,
+  nixInstallerCache,
+  pnpmCache,
+  projectCache,
+  restoreCache,
+} from './cache';
 import * as DIRENV from './direnv';
 import { prettyExec } from './exec';
 import * as NIX_STORE from './nix-store';
 
 const install = async () => {
-  await restoreCache(direnvCache);
+  await Promise.all([restoreCache(direnvCache), restoreCache(nixInstallerCache)]);
   await prettyExec(`${p.dirname(__filename)}/../install.sh`);
 };
 

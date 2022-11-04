@@ -2,6 +2,7 @@ import {
   Cache,
   direnvCache,
   nixCache,
+  nixInstallerCache,
   pnpmCache,
   projectCache,
   saveCache,
@@ -36,4 +37,5 @@ export const cleanup = () =>
     pnpmCacheCleanup(),
     simpleCleanup(direnvCache),
     simpleCleanup(projectCache),
+    simpleCleanup(nixInstallerCache),
   ]);

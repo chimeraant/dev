@@ -4,19 +4,19 @@ set -euo pipefail
 
 {
 
-  if type -p nix &>/dev/null ; then
-    echo "nix is already installed at $(type -p nix). Skipping installation."
+  export nix_version="2.11.0"
+  if $(type -p nix &>/dev/null) && [[ "nix (Nix) $(nix --version)" == "$nix_version" ]] ; then
+    echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
-    workdir=$(mktemp -d)
-    trap 'rm -rf "$workdir"' EXIT
-    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
-    sudo mkdir -p /etc/nix
-    sudo chmod 0755 /etc/nix
-    sudo cp $workdir/nix.conf /etc/nix/nix.conf
-    sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") --help
-    sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
+    if [[ !-d /etc/nix ]]; then
+      sudo mkdir -p /etc/nix
+      sudo chmod 0755 /etc/nix
+      printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf
+      curl -o /etc/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
+    fi
+    sh /etc/nix/install \
       --no-channel-add \
-      --nix-extra-conf-file "$workdir/nix.conf"
+      --nix-extra-conf-file /etc/nix/nix.conf
   fi
 
   export version="v2.32.1"

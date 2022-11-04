@@ -81,3 +81,8 @@ export const projectCache: Cache = {
   patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
   key: 'project',
 };
+
+export const nixInstallerCache: Cache = {
+  path: `/etc/nix`,
+  key: 'nix-2.11.0',
+};
