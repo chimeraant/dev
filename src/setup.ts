@@ -6,7 +6,10 @@ import { prettyExec } from './exec';
 const restoreNixCache = async () => {
   await prettyExec('sudo', ['mkdir', '-p', '--verbose', '/nix']);
   await prettyExec('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-  await Promise.all([restoreCache(nixCache), restoreCache(direnvCache)]);
+  await Promise.all([
+    restoreCache(nixCache, { downloadConcurrency: 16 }),
+    restoreCache(direnvCache),
+  ]);
   await prettyExec(`${__dirname}/../install.sh`);
 };
 
