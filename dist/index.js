@@ -121,6 +121,11 @@ exports.cleanup = void 0;
 const cache_1 = __nccwpck_require__(6175);
 const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
+const simpleCleanup = async (cache) => {
+    if (await (0, cache_1.shouldSaveCache)(cache)) {
+        await (0, cache_1.saveCache)(cache);
+    }
+};
 const nixCacheCleanup = async () => {
     if (await (0, cache_1.shouldSaveCache)(cache_1.nixCache)) {
         await NIX_STORE.exportTo(cache_1.nixCache.path);
@@ -133,17 +138,13 @@ const pnpmCacheCleanup = async () => {
         await (0, cache_1.saveCache)(cache_1.pnpmCache);
     }
 };
-const direnvCacheCleanup = async () => {
-    if (await (0, cache_1.shouldSaveCache)(cache_1.direnvCache)) {
-        await (0, cache_1.saveCache)(cache_1.direnvCache);
-    }
-};
-const projectCacheCleanup = async () => {
-    if (await (0, cache_1.shouldSaveCache)(cache_1.projectCache)) {
-        await (0, cache_1.saveCache)(cache_1.projectCache);
-    }
-};
-const cleanup = () => Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup(), projectCacheCleanup()]);
+const cleanup = () => Promise.all([
+    nixCacheCleanup(),
+    pnpmCacheCleanup(),
+    simpleCleanup(cache_1.direnvCache),
+    simpleCleanup(cache_1.projectCache),
+    simpleCleanup(cache_1.experimentalCache),
+]);
 exports.cleanup = cleanup;
 //# sourceMappingURL=cleanup.js.map
 
@@ -365,7 +366,11 @@ const install = async () => {
     await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
 };
 const setupNixDirenv = async () => {
-    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
+    const [nixCacheExists] = await Promise.all([
+        (0, cache_1.restoreCache)(cache_1.nixCache),
+        (0, cache_1.restoreCache)(cache_1.experimentalCache),
+        install(),
+    ]);
     if (nixCacheExists) {
         await NIX_STORE.importFrom(cache_1.nixCache.path);
     }
