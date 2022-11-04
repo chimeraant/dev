@@ -35,9 +35,9 @@ jobs:
         with:
           name: aabccd021nixgithubactionstest
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: curl -sfL https://direnv.net/install.sh | bash
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
-
       - run: pnpm lint
       - run: pnpm build:ci
       - name: Compare the expected and actual dist/ directories
@@ -69,6 +69,7 @@ jobs:
         with:
           name: aabccd021nixgithubactionstest
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: curl -sfL https://direnv.net/install.sh | bash
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
       - run: playwright pdf google.com a.pdf
