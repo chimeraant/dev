@@ -8,6 +8,7 @@ runs:
   post-if: 'success()'
 inputs:
   use_cache:
+    description: 'use cache'
 branding:
   icon: 'briefcase'
   color: 'green'
