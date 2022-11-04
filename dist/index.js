@@ -255,24 +255,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setup = void 0;
+exports.setup = exports.install = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const cache_1 = __nccwpck_require__(6175);
 const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
     await (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']);
     await (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-    await (0, cache_1.restoreCache)(cache_1.nixCache);
+    const nixCacheExists = await (0, cache_1.restoreCache)(cache_1.nixCache);
+    if (!nixCacheExists) {
+        await (0, exec_1.prettyExec)('sudo', ['rm', '-rf', '/nix']);
+    }
 };
+const install = async () => {
+    await Promise.all([(0, cache_1.restoreCache)(cache_1.direnvCache), restoreNixCache()]);
+    await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
+};
+exports.install = install;
 const setup = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
     core.addPath(`/nix/var/nix/profiles/default/bin`);
-    await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.direnvCache),
-        (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh"),
-        restoreNixCache(),
-        (0, cache_1.restoreCache)(cache_1.pnpmCache),
-    ]);
+    await Promise.all([(0, exports.install)(), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
     await (0, exec_1.prettyExec)('direnv', ['allow']);
     const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json']);
     Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
