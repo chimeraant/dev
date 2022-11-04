@@ -33,24 +33,55 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
-const util_1 = __nccwpck_require__(3175);
+const glob = __importStar(__nccwpck_require__(1770));
+const path = __importStar(__nccwpck_require__(1017));
+const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
+const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : defaultStr;
+const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
+    const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern.join('\n'), undefined, true));
+    const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
+    const restoreKeys = await nonEmptyStrOrElse(core.getInput(restoreKeyInput), defaultRestoreKeyInput);
+    return {
+        path: cachePath,
+        key: saveKey,
+        shouldSave: () => {
+            const restoredKey = core.getState(stateId);
+            return saveKey !== restoredKey;
+        },
+        restore: async () => {
+            const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys.split('/n'));
+            core.saveState(stateId, restoredKey);
+            return restoredKey;
+        },
+        save: () => cache.saveCache([cachePath], saveKey),
+    };
+};
+const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', ['flake.nix', 'flake.lock'], 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
+const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', ['**/pnpm-lock.yaml', '!.direnv/**'], 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
+const direnvVersion = 'v2.32.1';
+const direnv = {
+    installBinDir: '/usr/local/bin',
+    cacheKey: `${process.env['RUNNER_OS']}-direnv-${direnvVersion}`,
+    stateKey: 'direnv-state-key',
+    version: direnvVersion,
+};
 const restoreDirenvCache = async () => {
-    const restoredKey = await cache.restoreCache([`${util_1.direnv.installBinDir}/direnv`], util_1.direnv.cacheKey);
+    const restoredKey = await cache.restoreCache([`${direnv.installBinDir}/direnv`], direnv.cacheKey);
     const isDirenvCacheHit = `${restoredKey !== undefined}`;
-    core.saveState(util_1.direnv.stateKey, isDirenvCacheHit);
+    core.saveState(direnv.stateKey, isDirenvCacheHit);
 };
 const installNixAndDirenv = async () => {
     await restoreDirenvCache();
-    await (0, util_1.execScript)('install.sh', [], {
+    await execScript('install.sh', [], {
         env: {
             ...process.env,
-            direnv_bin_path: util_1.direnv.installBinDir,
-            direnv_version: util_1.direnv.version,
+            direnv_bin_path: direnv.installBinDir,
+            direnv_version: direnv.version,
         },
     });
 };
 const setupNixCache = async () => {
-    const nixCache = await (0, util_1.getNixCache)();
+    const nixCache = await getNixCache();
     const restoredCacheKey = await nixCache.restore();
     return [nixCache.path, restoredCacheKey];
 };
@@ -82,17 +113,55 @@ const setupNixDirenv = async () => {
     }
 };
 const pnpmRestore = async () => {
-    const pnpmCache = await (0, util_1.getPnpmCache)();
+    const pnpmCache = await getPnpmCache();
     await pnpmCache.restore();
+};
+const saveNixStore = async () => {
+    const nixCache = await getNixCache();
+    if (nixCache.shouldSave()) {
+        await exec.exec('nix', ['store', 'gc']);
+        await exec.exec('nix', ['store', 'optimise']);
+        await exec.exec('nix', [
+            'copy',
+            '--no-check-sigs',
+            '--to',
+            nixCache.path,
+            './#devShell.x86_64-linux',
+        ]);
+        await nixCache.save();
+    }
+};
+const savePnpmStore = async () => {
+    const pnpmCache = await getPnpmCache();
+    if (pnpmCache.shouldSave()) {
+        await exec.exec('pnpm store prune');
+        await pnpmCache.save();
+    }
+};
+const saveDirenvCache = async () => {
+    const isCacheHit = core.getState(direnv.stateKey);
+    if (isCacheHit === 'false') {
+        await cache.saveCache([`${direnv.installBinDir}/direnv`], direnv.cacheKey);
+    }
+};
+const setup = async () => {
+    // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
+    core.addPath('/nix/var/nix/profiles/default/bin');
+    core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/bin`);
+    await Promise.all([setupNixDirenv(), pnpmRestore()]);
+    await exec.exec('direnv', ['allow']);
+    await direnvExport();
+};
+const cleanup = async () => {
+    await Promise.all([saveNixStore(), savePnpmStore(), saveDirenvCache()]);
 };
 const run = async () => {
     try {
-        // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
-        core.addPath('/nix/var/nix/profiles/default/bin');
-        core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/bin`);
-        await Promise.all([setupNixDirenv(), pnpmRestore()]);
-        await exec.exec('direnv', ['allow']);
-        await direnvExport();
+        if (core.getState('is_post') === 'true') {
+            return await cleanup();
+        }
+        core.saveState('is_post', 'true');
+        return await setup();
     }
     catch (error) {
         if (error instanceof Error) {
@@ -102,78 +171,6 @@ const run = async () => {
 };
 run();
 //# sourceMappingURL=main.js.map
-
-/***/ }),
-
-/***/ 3175:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.direnv = exports.getPnpmCache = exports.getNixCache = exports.execScript = void 0;
-const cache = __importStar(__nccwpck_require__(7675));
-const core = __importStar(__nccwpck_require__(7954));
-const exec = __importStar(__nccwpck_require__(5082));
-const glob = __importStar(__nccwpck_require__(1770));
-const path = __importStar(__nccwpck_require__(1017));
-const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
-exports.execScript = execScript;
-const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : defaultStr;
-const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
-    const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern.join('\n'), undefined, true));
-    const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
-    const restoreKeys = await nonEmptyStrOrElse(core.getInput(restoreKeyInput), defaultRestoreKeyInput);
-    return {
-        path: cachePath,
-        key: saveKey,
-        shouldSave: () => {
-            const restoredKey = core.getState(stateId);
-            return saveKey !== restoredKey;
-        },
-        restore: async () => {
-            const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys.split('/n'));
-            core.saveState(stateId, restoredKey);
-            return restoredKey;
-        },
-        save: () => cache.saveCache([cachePath], saveKey),
-    };
-};
-const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', ['flake.nix', 'flake.lock'], 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
-exports.getNixCache = getNixCache;
-const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', ['**/pnpm-lock.yaml', '!.direnv/**'], 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
-exports.getPnpmCache = getPnpmCache;
-const direnvVersion = 'v2.32.1';
-exports.direnv = {
-    installBinDir: '/usr/local/bin',
-    cacheKey: `${process.env['RUNNER_OS']}-direnv-${direnvVersion}`,
-    stateKey: 'direnv-state-key',
-    version: direnvVersion,
-};
-//# sourceMappingURL=util.js.map
 
 /***/ }),
 
