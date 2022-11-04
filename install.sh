@@ -15,7 +15,7 @@ set -euo pipefail
     echo "$1" | tee -a "$workdir/nix.conf" >/dev/null
   }
   add_config "max-jobs = auto"
-  add_config "trusted-users = root $USER"
+  add_config "trusted-users = $USER"
   add_config "experimental-features = nix-command flakes"
 
   add_config "build-users-group ="
