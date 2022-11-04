@@ -32,10 +32,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v18
       - uses: cachix/cachix-action@v12
-         with:
-           name: mycache
-           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-           extraPullNames: aabccd021nixgithubactionstest
+        with:
+          name: aabccd021nixgithubactionstest
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
 
@@ -67,10 +66,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v18
       - uses: cachix/cachix-action@v12
-         with:
-           name: mycache
-           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-           extraPullNames: aabccd021nixgithubactionstest
+        with:
+          name: aabccd021nixgithubactionstest
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: direnv allow
       - run: direnv export gha >> "$GITHUB_ENV"
       - run: playwright pdf google.com a.pdf
