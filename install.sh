@@ -20,8 +20,9 @@ set -euo pipefail
     echo "::endgroup::"
   fi
 
-  LINE='eval "\$(direnv hook bash)"'
-  FILE="$HOME/.bashrc"
-  grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
+  line='eval "\$(direnv hook bash)"'
+  file="$HOME/.bashrc"
+  grep -qF -- "$line" "$file" || echo "$line" >> "$file"
+  source "$file"
   echo "::endgroup::"
 }

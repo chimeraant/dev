@@ -4,9 +4,6 @@ import * as exec from '@actions/exec';
 import * as glob from '@actions/glob';
 import * as path from 'path';
 
-const execScript = (scriptName: string, args?: string[], execOptions?: exec.ExecOptions) =>
-  exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
-
 const nonEmptyStrOrElse = async (str: string, defaultStr: string) =>
   str !== '' ? str : defaultStr;
 
@@ -78,7 +75,7 @@ const restoreDirenvCache = async () => {
 
 const installNixAndDirenv = async () => {
   await restoreDirenvCache();
-  await execScript('install.sh', [], {
+  await exec.exec(`${path.dirname(__filename)}/../install.sh`, [], {
     env: {
       ...process.env,
       direnv_bin_path: direnv.installBinDir,

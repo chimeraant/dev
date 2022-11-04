@@ -35,7 +35,6 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const glob = __importStar(__nccwpck_require__(1770));
 const path = __importStar(__nccwpck_require__(1017));
-const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.dirname(__filename), scriptName), args, execOptions);
 const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : defaultStr;
 const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
     const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern.join('\n'), undefined, true));
@@ -72,7 +71,7 @@ const restoreDirenvCache = async () => {
 };
 const installNixAndDirenv = async () => {
     await restoreDirenvCache();
-    await execScript('install.sh', [], {
+    await exec.exec(`${path.dirname(__filename)}/../install.sh`, [], {
         env: {
             ...process.env,
             direnv_bin_path: direnv.installBinDir,
