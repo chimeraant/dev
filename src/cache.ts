@@ -55,3 +55,9 @@ export const direnvCache: Cache = {
   path: `/usr/local/bin/direnv`,
   key: 'direnv-v2.32.1',
 };
+
+export const projectCache: Cache = {
+  path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
+  patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+  key: 'project',
+};

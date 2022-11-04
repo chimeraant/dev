@@ -1,4 +1,11 @@
-import { direnvCache, nixCache, pnpmCache, saveCache, shouldSaveCache } from './cache';
+import {
+  direnvCache,
+  nixCache,
+  pnpmCache,
+  projectCache,
+  saveCache,
+  shouldSaveCache,
+} from './cache';
 import { prettyExec } from './exec';
 import * as NIX_STORE from './nix-store';
 
@@ -22,5 +29,11 @@ const direnvCacheCleanup = async () => {
   }
 };
 
+const projectCacheCleanup = async () => {
+  if (await shouldSaveCache(projectCache)) {
+    await saveCache(projectCache);
+  }
+};
+
 export const cleanup = () =>
-  Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup()]);
+  Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup(), projectCacheCleanup()]);

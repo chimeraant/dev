@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
+exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -73,6 +73,11 @@ exports.pnpmCache = {
 exports.direnvCache = {
     path: `/usr/local/bin/direnv`,
     key: 'direnv-v2.32.1',
+};
+exports.projectCache = {
+    path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
+    patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+    key: 'project',
 };
 //# sourceMappingURL=cache.js.map
 
@@ -128,7 +133,12 @@ const direnvCacheCleanup = async () => {
         await (0, cache_1.saveCache)(cache_1.direnvCache);
     }
 };
-const cleanup = () => Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup()]);
+const projectCacheCleanup = async () => {
+    if (await (0, cache_1.shouldSaveCache)(cache_1.projectCache)) {
+        await (0, cache_1.saveCache)(cache_1.projectCache);
+    }
+};
+const cleanup = () => Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup(), projectCacheCleanup()]);
 exports.cleanup = cleanup;
 //# sourceMappingURL=cleanup.js.map
 
@@ -358,7 +368,7 @@ const setupNixDirenv = async () => {
 const setup = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
     core.addPath('/nix/var/nix/profiles/default/bin');
-    await Promise.all([setupNixDirenv(), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
+    await Promise.all([setupNixDirenv(), (0, cache_1.restoreCache)(cache_1.projectCache), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
     await DIRENV.setup();
 };
 exports.setup = setup;
