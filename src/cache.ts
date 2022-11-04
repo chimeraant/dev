@@ -39,3 +39,20 @@ export const saveCache = async (conf: Cache) => {
   const saveKey = await getSaveKey(conf);
   cache.saveCache([conf.path], saveKey);
 };
+
+export const nixCache: Cache = {
+  path: '/tmp/nixcache',
+  patterns: ['flake.nix', 'flake.lock'],
+  key: 'nix-store',
+};
+
+export const pnpmCache: Cache = {
+  path: `~/.local/share/pnpm/store/v3`,
+  patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
+  key: 'pnpm-store',
+};
+
+export const direnvCache: Cache = {
+  path: `/usr/local/bin/direnv`,
+  key: 'direnv-v2.32.1',
+};

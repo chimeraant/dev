@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
+exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -60,7 +60,77 @@ const saveCache = async (conf) => {
     cache.saveCache([conf.path], saveKey);
 };
 exports.saveCache = saveCache;
+exports.nixCache = {
+    path: '/tmp/nixcache',
+    patterns: ['flake.nix', 'flake.lock'],
+    key: 'nix-store',
+};
+exports.pnpmCache = {
+    path: `~/.local/share/pnpm/store/v3`,
+    patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
+    key: 'pnpm-store',
+};
+exports.direnvCache = {
+    path: `/usr/local/bin/direnv`,
+    key: 'direnv-v2.32.1',
+};
 //# sourceMappingURL=cache.js.map
+
+/***/ }),
+
+/***/ 4969:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.cleanup = void 0;
+const exec = __importStar(__nccwpck_require__(5082));
+const cache_1 = __nccwpck_require__(6175);
+const NIX_STORE = __importStar(__nccwpck_require__(7319));
+const nixCacheCleanup = async () => {
+    if (await (0, cache_1.shouldSaveCache)(cache_1.nixCache)) {
+        await NIX_STORE.exportTo(cache_1.nixCache.path);
+        await (0, cache_1.saveCache)(cache_1.nixCache);
+    }
+};
+const pnpmCacheCleanup = async () => {
+    if (await (0, cache_1.shouldSaveCache)(cache_1.pnpmCache)) {
+        await exec.exec('pnpm', ['store', 'prune']);
+        await (0, cache_1.saveCache)(cache_1.pnpmCache);
+    }
+};
+const direnvCacheCleanup = async () => {
+    if (await (0, cache_1.shouldSaveCache)(cache_1.direnvCache)) {
+        await (0, cache_1.saveCache)(cache_1.direnvCache);
+    }
+};
+const cleanup = () => Promise.all([nixCacheCleanup(), pnpmCacheCleanup(), direnvCacheCleanup()]);
+exports.cleanup = cleanup;
+//# sourceMappingURL=cleanup.js.map
 
 /***/ }),
 
@@ -147,71 +217,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7954));
-const exec = __importStar(__nccwpck_require__(5082));
-const p = __importStar(__nccwpck_require__(1017));
-const cache_1 = __nccwpck_require__(6175);
-const DIRENV = __importStar(__nccwpck_require__(9934));
-const NIX_STORE = __importStar(__nccwpck_require__(7319));
-const nixCache = {
-    path: '/tmp/nixcache',
-    patterns: ['flake.nix', 'flake.lock'],
-    key: 'nix-store',
-};
-const pnpmCache = {
-    path: `~/.local/share/pnpm/store/v3`,
-    patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
-    key: 'pnpm-store',
-};
-const direnvCache = {
-    path: `/usr/local/bin/direnv`,
-    key: 'direnv-v2.32.1',
-};
-const install = async () => {
-    await (0, cache_1.restoreCache)(direnvCache);
-    await exec.exec(`${p.dirname(__filename)}/../install.sh`);
-};
-const setupNixDirenv = async () => {
-    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(nixCache), install()]);
-    if (nixCacheExists) {
-        await NIX_STORE.importFrom(nixCache.path);
-    }
-};
-const setup = async () => {
-    // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
-    core.addPath('/nix/var/nix/profiles/default/bin');
-    await Promise.all([setupNixDirenv(), (0, cache_1.restoreCache)(pnpmCache)]);
-    await DIRENV.setup();
-};
-const cleanup = async () => {
-    await Promise.all([
-        async () => {
-            if (await (0, cache_1.shouldSaveCache)(nixCache)) {
-                await NIX_STORE.exportTo(nixCache.path);
-                await (0, cache_1.saveCache)(nixCache);
-            }
-        },
-        async () => {
-            if (await (0, cache_1.shouldSaveCache)(pnpmCache)) {
-                await exec.exec('pnpm', ['store', 'prune']);
-                await (0, cache_1.saveCache)(pnpmCache);
-            }
-        },
-        async () => {
-            if (await (0, cache_1.shouldSaveCache)(direnvCache)) {
-                await (0, cache_1.saveCache)(direnvCache);
-            }
-        },
-    ]);
-};
+const cleanup_1 = __nccwpck_require__(4969);
+const direnv_1 = __nccwpck_require__(9934);
 const run = async () => {
     try {
         if (core.getState('is_post') === 'true') {
-            core.info('start cleanup');
-            await cleanup();
-            core.info('done cleanup');
+            return await (0, cleanup_1.cleanup)();
         }
         core.saveState('is_post', 'true');
-        return await setup();
+        return await (0, direnv_1.setup)();
     }
     catch (error) {
         if (error instanceof Error) {
