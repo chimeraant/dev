@@ -206,7 +206,9 @@ const cleanup = async () => {
 const run = async () => {
     try {
         if (core.getState('is_post') === 'true') {
-            return await cleanup();
+            core.info('start cleanup');
+            await cleanup();
+            core.info('done cleanup');
         }
         core.saveState('is_post', 'true');
         return await setup();

@@ -39,7 +39,6 @@ const setupNixDirenv = async () => {
 const setup = async () => {
   // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
   core.addPath('/nix/var/nix/profiles/default/bin');
-
   await Promise.all([setupNixDirenv(), restoreCache(pnpmCache)]);
   await DIRENV.setup();
 };
@@ -69,7 +68,9 @@ const cleanup = async () => {
 const run = async () => {
   try {
     if (core.getState('is_post') === 'true') {
-      return await cleanup();
+      core.info('start cleanup');
+      await cleanup();
+      core.info('done cleanup');
     }
     core.saveState('is_post', 'true');
     return await setup();
