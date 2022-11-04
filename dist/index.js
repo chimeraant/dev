@@ -362,7 +362,7 @@ const install = async () => {
 };
 const setupNixDirenv = async () => {
     const [nixCacheExists] = await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.nixCache, { downloadConcurrency: 32 }),
+        (0, cache_1.restoreCache)(cache_1.nixCache, { downloadConcurrency: 64 }),
         install(),
     ]);
     if (nixCacheExists) {
