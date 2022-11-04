@@ -1,11 +1,4 @@
-import {
-  cacheCleanup,
-  direnvCache,
-  nixCache,
-  nixInstallerCache,
-  pnpmCache,
-  projectCache,
-} from './cache';
+import { cacheCleanup, direnvCache, nixCache, pnpmCache, projectCache } from './cache';
 import { prettyExec } from './exec';
 import * as NIX_STORE from './nix-store';
 
@@ -15,5 +8,4 @@ export const cleanup = () =>
     cacheCleanup(pnpmCache, { runBeforeSave: () => prettyExec('pnpm', ['store', 'prune']) }),
     cacheCleanup(direnvCache),
     cacheCleanup(projectCache),
-    cacheCleanup(nixInstallerCache),
   ]);
