@@ -23,19 +23,7 @@ set -euo pipefail
   sudo chmod 0755 /etc/nix
   sudo cp $workdir/nix.conf /etc/nix/nix.conf
 
-  # There is --retry-on-errors, but only newer curl versions support that
-  curl_retries=5
-  while ! curl -sS -o "$workdir/install" -v --fail -L "https://releases.nixos.org/nix/nix-2.11.0/install"
-  do
-    sleep 1
-    ((curl_retries--))
-    if [[ $curl_retries -le 0 ]]; then
-      echo "curl retries failed" >&2
-      exit 1
-    fi
-  done
-
-  sh "$workdir/install" \
+  sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
     --no-channel-add \
     --darwin-use-unencrypted-nix-store-volume \
     --nix-extra-conf-file "$workdir/nix.conf" \
