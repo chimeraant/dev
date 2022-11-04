@@ -225,8 +225,8 @@ const prettyExec = async (command, args, option) => {
         silent: true,
         ...option,
     });
-    const elapsed = process.hrtime(start)[1] / 1000000000;
-    core.startGroup(`${command} ${args?.join(' ')} exits with code ${output.exitCode} (${elapsed}s)`);
+    const elapsed = process.hrtime(start)[1] / 1000000;
+    core.startGroup(`"${command} ${args?.join(' ')}" ${elapsed}s code: ${output.exitCode}`);
     core.error(output.stderr);
     core.info(output.stdout);
     core.endGroup();
