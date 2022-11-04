@@ -8,7 +8,7 @@ set -euo pipefail
   if $(type -p nix &>/dev/null) && [[ "nix (Nix) $(nix --version)" == "$nix_version" ]] ; then
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
-    if [[ !-d /etc/nix ]]; then
+    if [[ ! -d /etc/nix ]]; then
       sudo mkdir -p /etc/nix
       sudo chmod 0755 /etc/nix
       printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf
