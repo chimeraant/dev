@@ -9,7 +9,7 @@ const saveCacheState = (stateId: string, restoredKey: string | undefined) => {
 };
 
 export type Cache = {
-  path: string;
+  path: string[];
   patterns?: string[];
   key: string;
 };
@@ -27,7 +27,7 @@ export const restoreCache = async (conf: Cache) => {
   console.time(`>>> restore cache "${conf.key}"`);
 
   const saveKey = await getSaveKey(conf);
-  const restoredKey = await cache.restoreCache([conf.path], saveKey, [restoreKey(conf)]);
+  const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)]);
   const result = saveCacheState(conf.key, restoredKey);
 
   console.timeEnd(`>>> restore cache "${conf.key}"`);
@@ -47,32 +47,43 @@ export const cacheCleanup = async (
   if (isShouldSave) {
     await hooks?.runBeforeSave?.();
     console.time(`>>> save cache "${conf.key}"`);
-    await cache.saveCache([conf.path], saveKey);
+    await cache.saveCache(conf.path, saveKey);
     console.timeEnd(`>>> save cache "${conf.key}"`);
   }
 
   return isShouldSave;
 };
 
+export const ultraCache: Cache = {
+  path: [
+    '/nix/store/',
+    `/nix/var/nix/profiles/per-user/${process.env['USER']}/profile/bin`,
+    '/nix/var/nix/profiles/default/bin/',
+    '/nix/var/nix/profiles/per-user/root/channels',
+  ],
+  patterns: ['flake.nix', 'flake.lock'],
+  key: 'ultra',
+};
+
 export const nixCache: Cache = {
-  path: '/tmp/nixcache',
+  path: ['/tmp/nixcache'],
   patterns: ['flake.nix', 'flake.lock'],
   key: 'nix-store',
 };
 
 export const pnpmCache: Cache = {
-  path: `~/.local/share/pnpm/store/v3`,
+  path: ['~/.local/share/pnpm/store/v3'],
   patterns: ['*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
   key: 'pnpm-store',
 };
 
 export const direnvCache: Cache = {
-  path: `/usr/local/bin/direnv`,
+  path: ['/usr/local/bin/direnv'],
   key: 'direnv-v2.32.1',
 };
 
 export const projectCache: Cache = {
-  path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
+  path: [`${process.env['GITHUB_WORKSPACE']}/.direnv`],
   patterns: ['flake.nix', 'flake.lock', '*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
   key: 'project',
 };
