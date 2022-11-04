@@ -13,12 +13,13 @@ const nonEmptyStrOrElse = async (str: string, defaultStr: string) =>
 const cacheConfig = async (
   cachePath: string,
   keyInput: string,
-  pattern: string,
+  pattern: string[],
   restoreKeyInput: string,
   defaultRestoreKeyInput: string,
   stateId: string
 ) => {
-  const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern, undefined, true));
+  const defaultKeyInput =
+    defaultRestoreKeyInput + (await glob.hashFiles(pattern.join('\n'), undefined, true));
   const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
   const restoreKeys = await nonEmptyStrOrElse(
     core.getInput(restoreKeyInput),
@@ -44,7 +45,7 @@ export const getNixCache = () =>
   cacheConfig(
     '/tmp/nixcache',
     'nix-store-cache-key',
-    'flake.nix\nflake.lock',
+    ['flake.nix', 'flake.lock'],
     'nix-store-cache-restore-keys',
     `${process.env['RUNNER_OS']}-nix-store-`,
     'nix-cache-state'
@@ -54,7 +55,7 @@ export const getPnpmCache = () =>
   cacheConfig(
     `${process.env['HOME']}/.local/share/pnpm/store/v3`,
     'pnpm-store-cache-key',
-    '**!(.direnv)/pnpm-lock.yaml',
+    ['**/pnpm-lock.yaml', '!.direnv/**'],
     'pnpm-store-cache-restore-keys',
     `${process.env['RUNNER_OS']}-pnpm-store-`,
     'nix-cache-state'

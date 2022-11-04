@@ -116,7 +116,7 @@ const execScript = (scriptName, args, execOptions) => exec.exec(path.join(path.d
 exports.execScript = execScript;
 const nonEmptyStrOrElse = async (str, defaultStr) => str !== '' ? str : defaultStr;
 const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaultRestoreKeyInput, stateId) => {
-    const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern, undefined, true));
+    const defaultKeyInput = defaultRestoreKeyInput + (await glob.hashFiles(pattern.join('\n'), undefined, true));
     const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
     const restoreKeys = await nonEmptyStrOrElse(core.getInput(restoreKeyInput), defaultRestoreKeyInput);
     return {
@@ -134,9 +134,9 @@ const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaul
         save: () => cache.saveCache([cachePath], saveKey),
     };
 };
-const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', 'flake.nix\nflake.lock', 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
+const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', ['flake.nix', 'flake.lock'], 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
 exports.getNixCache = getNixCache;
-const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', '**!(.direnv)/pnpm-lock.yaml', 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
+const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', ['**/pnpm-lock.yaml', '!.direnv/**'], 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
 exports.getPnpmCache = getPnpmCache;
 const direnvVersion = 'v2.32.1';
 exports.direnv = {
