@@ -11,7 +11,7 @@ set -euo pipefail
     if [[ ! -d /etc/nix ]]; then
       sudo mkdir -p /etc/nix
       sudo chmod 0755 /etc/nix
-      printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf
+      sudo sh -C 'printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf'
       curl -o /etc/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
     fi
     sh /etc/nix/install \
