@@ -24,7 +24,7 @@ jobs:
           fi
         id: diff
 
-  lint-and-check-cachix:
+  lint-and-check-dist-cachix:
     timeout-minutes: 5
     runs-on: ubuntu-latest
 
