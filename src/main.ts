@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 
 import { cleanup } from './cleanup';
-import { setup } from './direnv';
+import { setup } from './setup';
 
 const run = async () => {
   try {

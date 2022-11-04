@@ -218,14 +218,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(7954));
 const cleanup_1 = __nccwpck_require__(4969);
-const direnv_1 = __nccwpck_require__(9934);
+const setup_1 = __nccwpck_require__(8656);
 const run = async () => {
     try {
         if (core.getState('is_post') === 'true') {
             return await (0, cleanup_1.cleanup)();
         }
         core.saveState('is_post', 'true');
-        return await (0, direnv_1.setup)();
+        return await (0, setup_1.setup)();
     }
     catch (error) {
         if (error instanceof Error) {
@@ -279,6 +279,63 @@ const exportTo = async (nixCachePath) => {
 };
 exports.exportTo = exportTo;
 //# sourceMappingURL=nix-store.js.map
+
+/***/ }),
+
+/***/ 8656:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.setup = void 0;
+const core = __importStar(__nccwpck_require__(7954));
+const exec = __importStar(__nccwpck_require__(5082));
+const p = __importStar(__nccwpck_require__(1017));
+const cache_1 = __nccwpck_require__(6175);
+const DIRENV = __importStar(__nccwpck_require__(9934));
+const NIX_STORE = __importStar(__nccwpck_require__(7319));
+const install = async () => {
+    await (0, cache_1.restoreCache)(cache_1.direnvCache);
+    await exec.exec(`${p.dirname(__filename)}/../install.sh`);
+};
+const setupNixDirenv = async () => {
+    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
+    if (nixCacheExists) {
+        await NIX_STORE.importFrom(cache_1.nixCache.path);
+    }
+};
+const setup = async () => {
+    // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
+    core.addPath('/nix/var/nix/profiles/default/bin');
+    await Promise.all([setupNixDirenv(), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
+    await DIRENV.setup();
+};
+exports.setup = setup;
+//# sourceMappingURL=setup.js.map
 
 /***/ }),
 
