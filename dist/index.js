@@ -44,34 +44,34 @@ const hashPatters = async (conf) => conf.patterns === undefined
     : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 const getSaveKey = async (conf) => `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
 const restoreCache = async (conf) => {
-    core.info(`\n\n>>> Start: restore cache "${conf.key}"`);
+    core.info(`>>> Start: restore cache "${conf.key}"`);
     const start = performance.now();
     const saveKey = await getSaveKey(conf);
     const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
     const result = saveCacheState(conf.key, restoredKey);
     const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`\n\n>>> Done: restore cache "${conf.key}. Restored: ${result} (${elapsed}s)"`);
+    core.info(`>>> Done: restore cache "${conf.key}. Restored: ${result} (${elapsed}s)"`);
     return result;
 };
 exports.restoreCache = restoreCache;
 const shouldSaveCache = async (conf) => {
-    core.info(`\n\n>>> Start: should save cache "${conf.key}"`);
+    core.info(`>>> Start: should save cache "${conf.key}"`);
     const start = performance.now();
     const restoredKey = core.getState(conf.key);
     const saveKey = await getSaveKey(conf);
     const result = saveKey !== restoredKey;
     const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`\n\n>>> Done: should save cache "${conf.key}: ${result}. (${elapsed}s)"`);
+    core.info(`>>> Done: should save cache "${conf.key}: ${result}. (${elapsed}s)"`);
     return result;
 };
 exports.shouldSaveCache = shouldSaveCache;
 const saveCache = async (conf) => {
-    core.info(`\n\n>>> Start: save cache "${conf.key}"`);
+    core.info(`>>> Start: save cache "${conf.key}"`);
     const start = performance.now();
     const saveKey = await getSaveKey(conf);
     cache.saveCache([conf.path], saveKey);
     const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`\n\n>>> Done: save cache "${conf.key} (${elapsed}s)"`);
+    core.info(`>>> Done: save cache "${conf.key} (${elapsed}s)"`);
 };
 exports.saveCache = saveCache;
 exports.nixCache = {
@@ -238,7 +238,7 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
     const cmdStr = `${command} ${args?.join(' ')}`;
-    core.info(`\n\n>>> Start: "${cmdStr}"`);
+    core.info(`>>> Start: "${cmdStr}"`);
     const start = performance.now();
     const output = await exec.getExecOutput(command, args, {
         silent: true,
@@ -247,7 +247,7 @@ const prettyExec = async (command, args, option) => {
     const end = performance.now();
     const elapsed = ((end - start) / 1000).toFixed(0);
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-    core.info(`\n\n>>> Done: "${cmdStr}" (${elapsed}s) ${code}`);
+    core.info(`\n>>> Done: "${cmdStr}" (${elapsed}s) ${code}`);
     core.startGroup(`stderr`);
     core.info(output.stderr);
     core.endGroup();
