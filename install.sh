@@ -14,11 +14,10 @@ set -euo pipefail
 
     # cache
     if [[ ! -d /tmp/nix ]]; then
+      mkdir -p /tmp/nix
       curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install"
     fi
-    sh /tmp/nix/install \
-      --no-channel-add \
-      --nix-extra-conf-file /etc/nix/nix.conf
+    sh /tmp/nix/install --no-channel-add --nix-extra-conf-file /etc/nix/nix.conf
   fi
 
   export version="v2.32.1"
