@@ -9,6 +9,8 @@ runs:
 inputs:
   concurrency:
     description: 'concurrency'
+    required: false
+    default: '8'
 branding:
   icon: 'briefcase'
   color: 'green'
