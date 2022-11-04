@@ -104,6 +104,8 @@ const direnvExport = async () => {
   );
 };
 
+const devShellPath = './#devShell.x86_64-linux';
+
 const setupNixDirenv = async () => {
   const [[nixCachePath, restoredNixStoreCacheKey]] = await Promise.all([
     setupNixCache(),
@@ -112,13 +114,7 @@ const setupNixDirenv = async () => {
 
   const nixStoreCacheExists = restoredNixStoreCacheKey !== undefined;
   if (nixStoreCacheExists) {
-    await exec.exec('nix', [
-      'copy',
-      '--no-check-sigs',
-      '--from',
-      nixCachePath,
-      './#devShell.x86_64-linux',
-    ]);
+    await exec.exec('nix', ['copy', devShellPath, '--from', nixCachePath, '--no-check-sigs']);
   }
 };
 
@@ -132,13 +128,7 @@ const saveNixStore = async () => {
   if (nixCache.shouldSave()) {
     await exec.exec('nix', ['store', 'gc']);
     await exec.exec('nix', ['store', 'optimise']);
-    await exec.exec('nix', [
-      'copy',
-      '--no-check-sigs',
-      '--to',
-      nixCache.path,
-      './#devShell.x86_64-linux',
-    ]);
+    await exec.exec('nix', ['copy', devShellPath, '--to', nixCache.path, '--no-check-sigs']);
     await nixCache.save();
   }
 };
