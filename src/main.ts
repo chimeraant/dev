@@ -24,13 +24,13 @@ const setupNixCache = async () => {
 };
 
 const setupNixDirenv = async () => {
-  await Promise.all([setupNixCache(), cacheAndInstall()]);
+  const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
 
-  // if (restoredCacheKey !== undefined) {
-  //   await execScript('import.sh', [nixCache.path]);
-  // }
-  //
-  // await execScript('direnv-setup.sh');
+  if (restoredCacheKey !== undefined) {
+    await execScript('import.sh', [nixCache.path]);
+  }
+
+  await execScript('direnv-setup.sh');
 };
 
 const run = async () => {

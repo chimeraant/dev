@@ -13,13 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-      - uses: cachix/cachix-action@v11
-          with:
-            name: aabccd021nixgithubactionstest
-            pathsToPush: "./#devShell.x86_64-linux"
-            authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: direnv allow
-      - run: direnv export gha >> "$GITHUB_ENV"
       - run: pnpm lint
       - run: pnpm build:ci
       - name: Compare the expected and actual dist/ directories
@@ -38,13 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-      - uses: cachix/cachix-action@v11
-          with:
-            name: aabccd021nixgithubactionstest
-            pathsToPush: "./#devShell.x86_64-linux"
-            authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: direnv allow
-      - run: direnv export gha >> "$GITHUB_ENV"
       - run: playwright pdf google.com a.pdf
 
   release:
@@ -54,13 +40,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-      - uses: cachix/cachix-action@v11
-          with:
-            name: aabccd021nixgithubactionstest
-            pathsToPush: "./#devShell.x86_64-linux"
-            authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: direnv allow
-      - run: direnv export gha >> "$GITHUB_ENV"
       - run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
