@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.nixInstallerCache = exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.saveCache = exports.shouldSaveCache = exports.restoreCache = void 0;
+exports.nixInstallerCache = exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.cacheCleanup = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -50,30 +50,29 @@ const restoreCache = async (conf) => {
     const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
     const result = saveCacheState(conf.key, restoredKey);
     const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`>>> Done: restore cache "${conf.key}. Restored: ${result} (${elapsed}s)"`);
+    core.info(`>>> Done: restore cache "${conf.key}". Restored: ${result} (${elapsed}s)`);
     return result;
 };
 exports.restoreCache = restoreCache;
-const shouldSaveCache = async (conf) => {
+const cacheCleanup = async (conf, hooks) => {
     core.info(`>>> Start: should save cache "${conf.key}"`);
-    const start = performance.now();
+    const shouldSaveStart = performance.now();
     const restoredKey = core.getState(conf.key);
     const saveKey = await getSaveKey(conf);
-    const result = saveKey !== restoredKey;
-    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`>>> Done: should save cache "${conf.key}: ${result}. (${elapsed}s)"`);
-    return result;
+    const isShouldSave = saveKey !== restoredKey;
+    const shouldSaveElapsed = ((performance.now() - shouldSaveStart) / 1000).toFixed(0);
+    core.info(`>>> Done: should save cache "${conf.key}": ${isShouldSave}. (${shouldSaveElapsed}s)`);
+    if (isShouldSave) {
+        await hooks?.runBeforeSave?.();
+        core.info(`>>> Start: save cache "${conf.key}"`);
+        const saveStart = performance.now();
+        await cache.saveCache([conf.path], saveKey);
+        const saveElapsed = ((performance.now() - saveStart) / 1000).toFixed(0);
+        core.info(`>>> Done: save cache "${conf.key}" (${saveElapsed}s)`);
+    }
+    return isShouldSave;
 };
-exports.shouldSaveCache = shouldSaveCache;
-const saveCache = async (conf) => {
-    core.info(`>>> Start: save cache "${conf.key}"`);
-    const start = performance.now();
-    const saveKey = await getSaveKey(conf);
-    cache.saveCache([conf.path], saveKey);
-    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`>>> Done: save cache "${conf.key} (${elapsed}s)"`);
-};
-exports.saveCache = saveCache;
+exports.cacheCleanup = cacheCleanup;
 exports.nixCache = {
     path: '/tmp/nixcache',
     patterns: ['flake.nix', 'flake.lock'],
@@ -134,29 +133,12 @@ exports.cleanup = void 0;
 const cache_1 = __nccwpck_require__(6175);
 const exec_1 = __nccwpck_require__(9390);
 const NIX_STORE = __importStar(__nccwpck_require__(7319));
-const simpleCleanup = async (cache) => {
-    if (await (0, cache_1.shouldSaveCache)(cache)) {
-        await (0, cache_1.saveCache)(cache);
-    }
-};
-const nixCacheCleanup = async () => {
-    if (await (0, cache_1.shouldSaveCache)(cache_1.nixCache)) {
-        await NIX_STORE.exportTo(cache_1.nixCache.path);
-        await (0, cache_1.saveCache)(cache_1.nixCache);
-    }
-};
-const pnpmCacheCleanup = async () => {
-    if (await (0, cache_1.shouldSaveCache)(cache_1.pnpmCache)) {
-        await (0, exec_1.prettyExec)('pnpm', ['store', 'prune']);
-        await (0, cache_1.saveCache)(cache_1.pnpmCache);
-    }
-};
 const cleanup = () => Promise.all([
-    nixCacheCleanup(),
-    pnpmCacheCleanup(),
-    simpleCleanup(cache_1.direnvCache),
-    simpleCleanup(cache_1.projectCache),
-    simpleCleanup(cache_1.nixInstallerCache),
+    (0, cache_1.cacheCleanup)(cache_1.nixCache, { runBeforeSave: () => NIX_STORE.exportTo(cache_1.nixCache.path) }),
+    (0, cache_1.cacheCleanup)(cache_1.pnpmCache, { runBeforeSave: () => (0, exec_1.prettyExec)('pnpm', ['store', 'prune']) }),
+    (0, cache_1.cacheCleanup)(cache_1.direnvCache),
+    (0, cache_1.cacheCleanup)(cache_1.projectCache),
+    (0, cache_1.cacheCleanup)(cache_1.nixInstallerCache),
 ]);
 exports.cleanup = cleanup;
 //# sourceMappingURL=cleanup.js.map

@@ -31,32 +31,34 @@ export const restoreCache = async (conf: Cache) => {
   const result = saveCacheState(conf.key, restoredKey);
 
   const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-  core.info(`>>> Done: restore cache "${conf.key}. Restored: ${result} (${elapsed}s)"`);
+  core.info(`>>> Done: restore cache "${conf.key}". Restored: ${result} (${elapsed}s)`);
   return result;
 };
 
-export const shouldSaveCache = async (conf: Cache) => {
+export const cacheCleanup = async (
+  conf: Cache,
+  hooks?: { runBeforeSave?: () => Promise<unknown> }
+) => {
   core.info(`>>> Start: should save cache "${conf.key}"`);
-  const start = performance.now();
+  const shouldSaveStart = performance.now();
 
   const restoredKey = core.getState(conf.key);
   const saveKey = await getSaveKey(conf);
-  const result = saveKey !== restoredKey;
+  const isShouldSave = saveKey !== restoredKey;
 
-  const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-  core.info(`>>> Done: should save cache "${conf.key}: ${result}. (${elapsed}s)"`);
-  return result;
-};
+  const shouldSaveElapsed = ((performance.now() - shouldSaveStart) / 1000).toFixed(0);
+  core.info(`>>> Done: should save cache "${conf.key}": ${isShouldSave}. (${shouldSaveElapsed}s)`);
 
-export const saveCache = async (conf: Cache) => {
-  core.info(`>>> Start: save cache "${conf.key}"`);
-  const start = performance.now();
+  if (isShouldSave) {
+    await hooks?.runBeforeSave?.();
+    core.info(`>>> Start: save cache "${conf.key}"`);
+    const saveStart = performance.now();
+    await cache.saveCache([conf.path], saveKey);
+    const saveElapsed = ((performance.now() - saveStart) / 1000).toFixed(0);
+    core.info(`>>> Done: save cache "${conf.key}" (${saveElapsed}s)`);
+  }
 
-  const saveKey = await getSaveKey(conf);
-  cache.saveCache([conf.path], saveKey);
-
-  const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-  core.info(`>>> Done: save cache "${conf.key} (${elapsed}s)"`);
+  return isShouldSave;
 };
 
 export const nixCache: Cache = {
