@@ -1,3 +1,8 @@
-export const timeStart = (name: string) => console.time(`##[time] ${name}`);
+import * as core from '@actions/core';
 
-export const timeDone = (name: string) => console.timeEnd(`##[time] ${name}`);
+export const timeStart = (name: string) => {
+  core.info(`##[start] ${name}`);
+  console.time(`##[end] ${name}`);
+};
+
+export const timeDone = (name: string) => console.timeEnd(`##[end] ${name}`);
