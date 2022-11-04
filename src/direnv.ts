@@ -12,5 +12,4 @@ const allow = () => prettyExec('direnv', ['allow']);
 export const setup = async () => {
   await allow();
   await exportVariables();
-  await exportVariables();
 };

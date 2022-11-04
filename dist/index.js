@@ -74,7 +74,7 @@ exports.nixCache = {
 };
 exports.pnpmCache = {
     path: `~/.local/share/pnpm/store/v3`,
-    patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
+    patterns: ['*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
     key: 'pnpm-store',
 };
 exports.direnvCache = {
@@ -83,7 +83,7 @@ exports.direnvCache = {
 };
 exports.projectCache = {
     path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
-    patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+    patterns: ['flake.nix', 'flake.lock', '*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
     key: 'project',
 };
 //# sourceMappingURL=cache.js.map
@@ -173,7 +173,6 @@ const exportVariables = async () => {
 const allow = () => (0, exec_1.prettyExec)('direnv', ['allow']);
 const setup = async () => {
     await allow();
-    await exportVariables();
     await exportVariables();
 };
 exports.setup = setup;
