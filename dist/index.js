@@ -146,7 +146,6 @@ const saveDirenvCache = async () => {
 const setup = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
     core.addPath('/nix/var/nix/profiles/default/bin');
-    core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/bin`);
     await Promise.all([setupNixDirenv(), pnpmRestore()]);
     await exec.exec('direnv', ['allow']);
     await direnvExport();
