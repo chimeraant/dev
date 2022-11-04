@@ -41,23 +41,37 @@ const saveCacheState = (stateId, restoredKey) => {
 };
 const hashPatters = async (conf) => conf.patterns === undefined
     ? ''
-    : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, true)}`;
+    : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 const getSaveKey = async (conf) => `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
 const restoreCache = async (conf) => {
+    core.info(`\n\n>>> Start: restore cache "${conf.key}"`);
+    const start = performance.now();
     const saveKey = await getSaveKey(conf);
     const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
-    return saveCacheState(conf.key, restoredKey);
+    const result = saveCacheState(conf.key, restoredKey);
+    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
+    core.info(`\n\n>>> Done: restore cache "${conf.key}. Restored: ${result} (${elapsed}s)"`);
+    return result;
 };
 exports.restoreCache = restoreCache;
 const shouldSaveCache = async (conf) => {
+    core.info(`\n\n>>> Start: should save cache "${conf.key}"`);
+    const start = performance.now();
     const restoredKey = core.getState(conf.key);
     const saveKey = await getSaveKey(conf);
-    return saveKey !== restoredKey;
+    const result = saveKey !== restoredKey;
+    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
+    core.info(`\n\n>>> Done: should save cache "${conf.key}: ${result}. (${elapsed}s)"`);
+    return result;
 };
 exports.shouldSaveCache = shouldSaveCache;
 const saveCache = async (conf) => {
+    core.info(`\n\n>>> Start: save cache "${conf.key}"`);
+    const start = performance.now();
     const saveKey = await getSaveKey(conf);
     cache.saveCache([conf.path], saveKey);
+    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
+    core.info(`\n\n>>> Done: save cache "${conf.key} (${elapsed}s)"`);
 };
 exports.saveCache = saveCache;
 exports.nixCache = {
