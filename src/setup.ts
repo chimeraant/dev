@@ -16,8 +16,8 @@ const setupNixDirenv = async () => {
   const ultraCacheExists = await restoreCache(ultraCache);
   if (!ultraCacheExists) {
     await prettyExec('sudo', ['rm', '-rf', '/nix']);
-    return await install();
   }
+  return await install();
   // const [nixCacheExists] = await Promise.all([
   //   restoreCache(nixCache),
   //   install(),
