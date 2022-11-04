@@ -165,14 +165,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
-const exec = __importStar(__nccwpck_require__(5082));
 const exec_1 = __nccwpck_require__(9390);
 const exportVariables = async () => {
-    const { stdout } = await exec.getExecOutput('direnv', ['export', 'json']);
+    const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json']);
     Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
 };
+const allow = () => (0, exec_1.prettyExec)('direnv', ['allow']);
 const setup = async () => {
-    await (0, exec_1.prettyExec)('direnv', ['allow']);
+    await allow();
     await exportVariables();
 };
 exports.setup = setup;
@@ -221,14 +221,15 @@ const prettyExec = async (command, args, option) => {
     const end = performance.now();
     const elapsed = ((end - start) / 1000).toFixed(0);
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-    const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
-    core.info(`\n> "${cmdStr}" (${elapsed}s) ${code}`);
+    const cmdStr = `${command} ${args?.join(' ')}`;
+    core.info(`\n\n>>> "${cmdStr}" (${elapsed}s) ${code}`);
     core.startGroup(`stderr`);
     core.info(output.stderr);
     core.endGroup();
     core.startGroup(`stdout`);
     core.info(output.stdout);
     core.endGroup();
+    core.info('\n');
     return output;
 };
 exports.prettyExec = prettyExec;
