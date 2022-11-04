@@ -210,14 +210,21 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
     const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
-    console.time(`>>> "${cmdStr}"`);
+    const mark = `>>> "${cmdStr}"`;
+    console.time(mark);
     const buffers = [];
     const output = await exec.getExecOutput(command, args, {
         silent: true,
         ignoreReturnCode: true,
         listeners: {
-            stdline: (s) => buffers.push(`[stdout] ${s}`),
-            stderr: (s) => buffers.push(`[stderr] ${s}`),
+            stdline: (s) => {
+                core.info(`${mark} [stdout] ${s}`);
+                buffers.push(`[stdout] ${s}`);
+            },
+            stderr: (s) => {
+                core.info(`${mark} [stderr] ${s}`);
+                buffers.push(`[stderr] ${s}`);
+            },
         },
         ...option,
     });

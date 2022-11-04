@@ -3,14 +3,21 @@ import * as exec from '@actions/exec';
 
 export const prettyExec = async (command: string, args?: string[], option?: exec.ExecOptions) => {
   const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
-  console.time(`>>> "${cmdStr}"`);
+  const mark = `>>> "${cmdStr}"`;
+  console.time(mark);
   const buffers: string[] = [];
   const output = await exec.getExecOutput(command, args, {
     silent: true,
     ignoreReturnCode: true,
     listeners: {
-      stdline: (s) => buffers.push(`[stdout] ${s}`),
-      stderr: (s) => buffers.push(`[stderr] ${s}`),
+      stdline: (s) => {
+        core.info(`${mark} [stdout] ${s}`);
+        buffers.push(`[stdout] ${s}`);
+      },
+      stderr: (s) => {
+        core.info(`${mark} [stderr] ${s}`);
+        buffers.push(`[stderr] ${s}`);
+      },
     },
     ...option,
   });
