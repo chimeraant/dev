@@ -9,11 +9,11 @@
         nodejs-16_x
         nodePackages.pnpm
         playwright
-        playwright.browsers
+        playwright.browsers-firefox
       ];
 
       shellHook = ''
-        export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers}
+        export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-firefox}
         export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
         function assertEqual {
           result="$(eval "$1")"
