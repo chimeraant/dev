@@ -71,8 +71,7 @@ const cacheCleanup = async (conf, hooks) => {
 exports.cacheCleanup = cacheCleanup;
 exports.nixCache = {
     path: [
-        '/nix/store/',
-        '/nix/var/nix/db/db.sqlite',
+        '/nix',
         '!/nix/var/nix/db/big-lock',
         '!/nix/var/nix/db/reserved',
         '!/nix/var/nix/daemon-socket/socket',
