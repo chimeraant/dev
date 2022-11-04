@@ -218,7 +218,7 @@ const prettyExec = async (command, args, option) => {
         silent: true,
         ...option,
     });
-    const elapsed = (process.hrtime(start)[1] / 1000000).toFixed(0);
+    const elapsed = (process.hrtime(start)[1] / 10000000).toFixed(0);
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
     const cmdStr = `${command} ${args?.join(' ')}`;
     core.info(`(${elapsed}s) "${cmdStr}" ${code}`);
