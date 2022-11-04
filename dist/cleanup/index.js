@@ -136,7 +136,7 @@ const cacheConfig = async (cachePath, keyInput, pattern, restoreKeyInput, defaul
 };
 const getNixCache = () => cacheConfig('/tmp/nixcache', 'nix-store-cache-key', 'flake.nix\nflake.lock', 'nix-store-cache-restore-keys', `${process.env['RUNNER_OS']}-nix-store-`, 'nix-cache-state');
 exports.getNixCache = getNixCache;
-const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', '!(.direnv)**/pnpm-lock.yaml', 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
+const getPnpmCache = () => cacheConfig(`${process.env['HOME']}/.local/share/pnpm/store/v3`, 'pnpm-store-cache-key', '**!(.direnv)/pnpm-lock.yaml', 'pnpm-store-cache-restore-keys', `${process.env['RUNNER_OS']}-pnpm-store-`, 'nix-cache-state');
 exports.getPnpmCache = getPnpmCache;
 const direnvVersion = 'v2.32.1';
 exports.direnv = {

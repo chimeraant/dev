@@ -54,7 +54,7 @@ export const getPnpmCache = () =>
   cacheConfig(
     `${process.env['HOME']}/.local/share/pnpm/store/v3`,
     'pnpm-store-cache-key',
-    '!(.direnv)**/pnpm-lock.yaml',
+    '**!(.direnv)/pnpm-lock.yaml',
     'pnpm-store-cache-restore-keys',
     `${process.env['RUNNER_OS']}-pnpm-store-`,
     'nix-cache-state'
