@@ -302,13 +302,13 @@ const exec_1 = __nccwpck_require__(9390);
 const devShellPath = './#devShell.x86_64-linux';
 const importFrom = async (_nixCachePath) => {
     await (0, exec_1.prettyExec)('sudo', ['chmod', '-R', '777', '/nix']);
-    await (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--from', '/', '--no-check-sigs']);
+    await (0, exec_1.prettyExec)('sudo', ['nix', 'copy', devShellPath, '--from', '/', '--no-check-sigs']);
 };
 exports.importFrom = importFrom;
 const exportTo = async (_nixCachePath) => {
     await (0, exec_1.prettyExec)('nix', ['store', 'gc']);
     await (0, exec_1.prettyExec)('nix', ['store', 'optimise']);
-    await (0, exec_1.prettyExec)('nix', ['copy', devShellPath, '--to', '/', '--no-check-sigs']);
+    await (0, exec_1.prettyExec)('sudo', ['nix', 'copy', devShellPath, '--to', '/', '--no-check-sigs']);
 };
 exports.exportTo = exportTo;
 //# sourceMappingURL=nix-store.js.map
