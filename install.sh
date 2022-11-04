@@ -8,7 +8,7 @@ set -euo pipefail
   else
     workdir=$(mktemp -d)
     trap 'rm -rf "$workdir"' EXIT
-    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf" >/dev/null
+    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
     sudo mkdir -p /etc/nix
     sudo chmod 0755 /etc/nix
     sudo cp $workdir/nix.conf /etc/nix/nix.conf
