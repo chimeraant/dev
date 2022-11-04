@@ -143,7 +143,7 @@ exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
-    const cmdStr = `${command}${(args ?? [' ']).join(' ')}`;
+    const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
     const mark = `>>> "${cmdStr}"`;
     console.time(mark);
     const buffers = [];
@@ -262,10 +262,8 @@ const core = __importStar(__nccwpck_require__(7954));
 const cache_1 = __nccwpck_require__(6175);
 const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
-    await Promise.all([
-        (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']),
-        (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']),
-    ]);
+    await (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']);
+    await (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
     const nixCacheExists = await (0, cache_1.restoreCache)(cache_1.nixCache);
     if (!nixCacheExists) {
         await (0, exec_1.prettyExec)('sudo', ['rm', '-rf', '/nix']);

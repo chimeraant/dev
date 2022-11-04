@@ -4,10 +4,8 @@ import { direnvCache, nixCache, pnpmCache, restoreCache } from './cache';
 import { prettyExec } from './exec';
 
 const restoreNixCache = async () => {
-  await Promise.all([
-    prettyExec('sudo', ['mkdir', '-p', '--verbose', '/nix']),
-    prettyExec('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']),
-  ]);
+  await prettyExec('sudo', ['mkdir', '-p', '--verbose', '/nix']);
+  await prettyExec('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
   const nixCacheExists = await restoreCache(nixCache);
   if (!nixCacheExists) {
     await prettyExec('sudo', ['rm', '-rf', '/nix']);
