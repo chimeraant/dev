@@ -28,7 +28,13 @@ const setupNixDirenv = async () => {
   const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
 
   if (restoredCacheKey !== undefined) {
-    await execScript('import.sh', [nixCache.path]);
+    await execScript('nix', [
+      'copy',
+      '--no-check-sigs',
+      '--from',
+      nixCache.path,
+      './#devShell.x86_64-linux',
+    ]);
   }
 
   await exec.exec('direnv', ['allow']);

@@ -7,7 +7,15 @@ import { direnv, execScript, getNixCache, getPnpmCache } from './util';
 const restoreNixStore = async () => {
   const nixCache = await getNixCache();
   if (nixCache.shouldSave()) {
-    await execScript('export.sh', [nixCache.path]);
+    await execScript('nix', ['store', 'gc']);
+    await execScript('nix', ['store', 'optimise']);
+    await execScript('nix', [
+      'copy',
+      '--no-check-sigs',
+      '--to',
+      nixCache.path,
+      './#devShell.x86_64-linux',
+    ]);
     await nixCache.save();
   }
 };

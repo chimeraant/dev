@@ -37,7 +37,15 @@ const util_1 = __nccwpck_require__(3175);
 const restoreNixStore = async () => {
     const nixCache = await (0, util_1.getNixCache)();
     if (nixCache.shouldSave()) {
-        await (0, util_1.execScript)('export.sh', [nixCache.path]);
+        await (0, util_1.execScript)('nix', ['store', 'gc']);
+        await (0, util_1.execScript)('nix', ['store', 'optimise']);
+        await (0, util_1.execScript)('nix', [
+            'copy',
+            '--no-check-sigs',
+            '--to',
+            nixCache.path,
+            './#devShell.x86_64-linux',
+        ]);
         await nixCache.save();
     }
 };
