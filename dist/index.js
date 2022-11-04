@@ -224,7 +224,7 @@ exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
-    const cmdStr = `${command} ${args?.join(' ')}`;
+    const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
     core.info(`>>> Start: "${cmdStr}"`);
     const start = performance.now();
     const output = await exec.getExecOutput(command, args, {

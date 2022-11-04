@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
 export const prettyExec = async (command: string, args?: string[], option?: exec.ExecOptions) => {
-  const cmdStr = `${command} ${args?.join(' ')}`;
+  const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
   core.info(`>>> Start: "${cmdStr}"`);
   const start = performance.now();
   const output = await exec.getExecOutput(command, args, {
