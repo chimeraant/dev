@@ -7,8 +7,8 @@ runs:
   post: 'dist/index.js'
   post-if: 'success()'
 inputs:
-  use_cache:
-    description: 'use cache'
+  concurrency:
+    description: 'concurrency'
 branding:
   icon: 'briefcase'
   color: 'green'
