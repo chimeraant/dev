@@ -7,9 +7,8 @@ const exportVariables = async () => {
   Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
 };
 
-const allow = () => prettyExec('direnv', ['allow']);
-
 export const setup = async () => {
-  await allow();
+  await prettyExec('nix', ['develop']);
+  await prettyExec('direnv', ['allow']);
   await exportVariables();
 };
