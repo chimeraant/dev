@@ -27,13 +27,9 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-22.04
     needs: lint-and-check-dist
-    strategy:
-      concurrency: [ 2, 4, 8, 16, 32, 64, 128 ]
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-        with:
-          concurrency: ${{ matrix.concurrency }}
       - run: playwright pdf google.com a.pdf
 
   release:
