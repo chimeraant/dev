@@ -45,10 +45,10 @@ const hashPatters = async (conf) => conf.patterns === undefined
     : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 const restoreKey = ({ key }) => `${process.env['RUNNER_OS']}-${key}`;
 const getSaveKey = async (conf) => `${restoreKey(conf)}${await hashPatters(conf)}`;
-const restoreCache = async (conf) => {
+const restoreCache = async (conf, opts) => {
     (0, time_1.timeStart)(`restore cache "${conf.key}"`);
     const saveKey = await getSaveKey(conf);
-    const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)]);
+    const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)], opts);
     const result = saveCacheState(conf.key, restoredKey);
     (0, time_1.timeDone)(`restore cache "${conf.key}"`);
     return result;
@@ -262,7 +262,7 @@ const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
     await (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']);
     await (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-    const nixCacheExists = await (0, cache_1.restoreCache)(cache_1.nixCache);
+    const nixCacheExists = await (0, cache_1.restoreCache)(cache_1.nixCache, { downloadConcurrency: 64 });
     if (!nixCacheExists) {
         await (0, exec_1.prettyExec)('sudo', ['rm', '-rf', '/nix']);
     }

@@ -1,4 +1,5 @@
 import * as cache from '@actions/cache';
+import { DownloadOptions } from '@actions/cache/lib/options';
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 
@@ -25,11 +26,11 @@ const restoreKey = ({ key }: Cache) => `${process.env['RUNNER_OS']}-${key}`;
 
 const getSaveKey = async (conf: Cache) => `${restoreKey(conf)}${await hashPatters(conf)}`;
 
-export const restoreCache = async (conf: Cache) => {
+export const restoreCache = async (conf: Cache, opts?: DownloadOptions) => {
   timeStart(`restore cache "${conf.key}"`);
 
   const saveKey = await getSaveKey(conf);
-  const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)]);
+  const restoredKey = await cache.restoreCache(conf.path, saveKey, [restoreKey(conf)], opts);
   const result = saveCacheState(conf.key, restoredKey);
 
   timeDone(`restore cache "${conf.key}"`);

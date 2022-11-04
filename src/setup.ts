@@ -6,7 +6,7 @@ import { prettyExec } from './exec';
 const restoreNixCache = async () => {
   await prettyExec('sudo', ['mkdir', '-p', '--verbose', '/nix']);
   await prettyExec('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-  const nixCacheExists = await restoreCache(nixCache);
+  const nixCacheExists = await restoreCache(nixCache, { downloadConcurrency: 64 });
   if (!nixCacheExists) {
     await prettyExec('sudo', ['rm', '-rf', '/nix']);
   }
