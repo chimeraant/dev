@@ -22,8 +22,8 @@ export const prettyExec = async (command: string, args?: string[], option?: exec
     ...option,
   });
   const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-  console.timeEnd(`>>> "${cmdStr}"`);
-  core.startGroup(`>>> "${cmdStr}"`);
+  console.timeEnd(mark);
+  core.startGroup(mark);
   buffers.forEach(core.info);
   core.endGroup();
   if (output.exitCode !== 0) {
