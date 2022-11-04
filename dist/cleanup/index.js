@@ -35,11 +35,11 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const util_1 = __nccwpck_require__(3175);
 const restoreNixStore = async () => {
-    const nixCache = await (0, util_1.getNixCache)();
-    if (nixCache.shouldSave()) {
-        await (0, util_1.execScript)('export.sh', [nixCache.path]);
-        await nixCache.save();
-    }
+    // const nixCache = await getNixCache();
+    // if (nixCache.shouldSave()) {
+    //   await execScript('export.sh', [nixCache.path]);
+    //   await nixCache.save();
+    // }
 };
 const restorePnpmStore = async () => {
     const pnpmCache = await (0, util_1.getPnpmCache)();
