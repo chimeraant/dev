@@ -23,15 +23,13 @@ const getSaveKey = async (conf: Cache) =>
   `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
 
 export const restoreCache = async (conf: Cache) => {
-  core.info(`>>> Start: restore cache "${conf.key}"`);
-  const start = performance.now();
+  console.time(`>>> restore cache "${conf.key}"`);
 
   const saveKey = await getSaveKey(conf);
   const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
   const result = saveCacheState(conf.key, restoredKey);
 
-  const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-  core.info(`>>> Done: restore cache "${conf.key}". Restored: ${result} (${elapsed}s)`);
+  console.timeEnd(`>>> restore cache "${conf.key}"`);
   return result;
 };
 
@@ -39,23 +37,17 @@ export const cacheCleanup = async (
   conf: Cache,
   hooks?: { runBeforeSave?: () => Promise<unknown> }
 ) => {
-  core.info(`>>> Start: should save cache "${conf.key}"`);
-  const shouldSaveStart = performance.now();
-
+  console.time(`>>> should save cache "${conf.key}"`);
   const restoredKey = core.getState(conf.key);
   const saveKey = await getSaveKey(conf);
   const isShouldSave = saveKey !== restoredKey;
-
-  const shouldSaveElapsed = ((performance.now() - shouldSaveStart) / 1000).toFixed(0);
-  core.info(`>>> Done: should save cache "${conf.key}": ${isShouldSave}. (${shouldSaveElapsed}s)`);
+  console.timeEnd(`>>> should save cache "${conf.key}"`);
 
   if (isShouldSave) {
     await hooks?.runBeforeSave?.();
-    core.info(`>>> Start: save cache "${conf.key}"`);
-    const saveStart = performance.now();
+    console.time(`>>> save cache "${conf.key}"`);
     await cache.saveCache([conf.path], saveKey);
-    const saveElapsed = ((performance.now() - saveStart) / 1000).toFixed(0);
-    core.info(`>>> Done: save cache "${conf.key}" (${saveElapsed}s)`);
+    console.timeEnd(`>>> save cache "${conf.key}"`);
   }
 
   return isShouldSave;

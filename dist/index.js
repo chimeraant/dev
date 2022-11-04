@@ -44,31 +44,25 @@ const hashPatters = async (conf) => conf.patterns === undefined
     : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 const getSaveKey = async (conf) => `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
 const restoreCache = async (conf) => {
-    core.info(`>>> Start: restore cache "${conf.key}"`);
-    const start = performance.now();
+    console.time(`>>> restore cache "${conf.key}"`);
     const saveKey = await getSaveKey(conf);
     const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
     const result = saveCacheState(conf.key, restoredKey);
-    const elapsed = ((performance.now() - start) / 1000).toFixed(0);
-    core.info(`>>> Done: restore cache "${conf.key}". Restored: ${result} (${elapsed}s)`);
+    console.timeEnd(`>>> restore cache "${conf.key}"`);
     return result;
 };
 exports.restoreCache = restoreCache;
 const cacheCleanup = async (conf, hooks) => {
-    core.info(`>>> Start: should save cache "${conf.key}"`);
-    const shouldSaveStart = performance.now();
+    console.time(`>>> should save cache "${conf.key}"`);
     const restoredKey = core.getState(conf.key);
     const saveKey = await getSaveKey(conf);
     const isShouldSave = saveKey !== restoredKey;
-    const shouldSaveElapsed = ((performance.now() - shouldSaveStart) / 1000).toFixed(0);
-    core.info(`>>> Done: should save cache "${conf.key}": ${isShouldSave}. (${shouldSaveElapsed}s)`);
+    console.timeEnd(`>>> should save cache "${conf.key}"`);
     if (isShouldSave) {
         await hooks?.runBeforeSave?.();
-        core.info(`>>> Start: save cache "${conf.key}"`);
-        const saveStart = performance.now();
+        console.time(`>>> save cache "${conf.key}"`);
         await cache.saveCache([conf.path], saveKey);
-        const saveElapsed = ((performance.now() - saveStart) / 1000).toFixed(0);
-        core.info(`>>> Done: save cache "${conf.key}" (${saveElapsed}s)`);
+        console.timeEnd(`>>> save cache "${conf.key}"`);
     }
     return isShouldSave;
 };
@@ -220,17 +214,14 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
     const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
-    core.info(`>>> Start: "${cmdStr}"`);
-    const start = performance.now();
+    console.time(`>>> "${cmdStr}"`);
     const output = await exec.getExecOutput(command, args, {
         silent: true,
         ignoreReturnCode: true,
         ...option,
     });
-    const end = performance.now();
-    const elapsed = ((end - start) / 1000).toFixed(0);
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-    core.info(`\n>>> Done: "${cmdStr}" (${elapsed}s)`);
+    console.timeEnd(`>>> "${cmdStr}"`);
     core.startGroup(`stderr`);
     core.info(output.stderr);
     core.endGroup();
@@ -361,10 +352,7 @@ const install = async () => {
     await (0, exec_1.prettyExec)(`${p.dirname(__filename)}/../install.sh`);
 };
 const setupNixDirenv = async () => {
-    const [nixCacheExists] = await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.nixCache),
-        install(),
-    ]);
+    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), install()]);
     if (nixCacheExists) {
         await NIX_STORE.importFrom(cache_1.nixCache.path);
     }
