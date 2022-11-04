@@ -8,7 +8,7 @@ set -euo pipefail
   if $(type -p nix &>/dev/null) && [[ $(nix --version) == "nix (Nix) $nix_version" ]] ; then
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
-    # Create a temporary workdir
+    sudo rm -rf /nix
     nix_conf=$(mktemp)
     trap 'rm "$nix_conf"' EXIT
     printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$nix_conf"

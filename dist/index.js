@@ -272,11 +272,8 @@ const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
     await (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']);
     await (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-    const [nixCacheExists] = await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), (0, cache_1.restoreCache)(cache_1.direnvCache)]);
-    if (!nixCacheExists) {
-        await (0, exec_1.prettyExec)('sudo', ['rm', '-rf', '/nix']);
-        await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
-    }
+    await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), (0, cache_1.restoreCache)(cache_1.direnvCache)]);
+    await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
 };
 const setup = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
