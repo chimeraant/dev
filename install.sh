@@ -12,7 +12,6 @@ set -euo pipefail
     workdir=$(mktemp -d)
     trap 'rm -rf "$workdir"' EXIT
     printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
-    sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") --help
     sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
       --no-channel-add \
       --daemon \
