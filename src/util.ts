@@ -10,39 +10,29 @@ export const execScript = (scriptName: string, args?: string[], execOptions?: ex
 const nonEmptyStrOrElse = async (str: string, defaultStr: () => Promise<string>) =>
   str !== '' ? str : await defaultStr();
 
-const nonEmptyArrOrElse = (arr: string[], defaultArr: string[]) =>
-  arr.length > 0 ? arr : defaultArr;
-
 const cacheConfig = async (
   cachePath: string,
   keyInput: string,
   defaultKeyInput: () => Promise<string>,
   restoreKeyInput: string,
-  defaultRestoreKeyInput: string[]
+  defaultRestoreKeyInput: () => Promise<string>,
+  stateId: string
 ) => {
-  const cacheStateId = keyInput;
   const saveKey = await nonEmptyStrOrElse(core.getInput(keyInput), defaultKeyInput);
-  const restoreKeys = nonEmptyArrOrElse(
-    core.getInput(restoreKeyInput).split('\n'),
+  const restoreKeys = await nonEmptyStrOrElse(
+    core.getInput(restoreKeyInput),
     defaultRestoreKeyInput
   );
   return {
     path: cachePath,
     key: saveKey,
     shouldSave: () => {
-      const restoredKey = core.getState(`${cacheStateId}-restored-key`);
-      const isShouldSave = saveKey !== restoredKey;
-      core.info(
-        `Cache should save: ${JSON.stringify({ cacheStateId, restoredKey, saveKey, isShouldSave })}`
-      );
-      return isShouldSave;
+      const restoredKey = core.getState(stateId);
+      return saveKey !== restoredKey;
     },
     restore: async () => {
-      const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys);
-      core.info(
-        `Cache restored: ${JSON.stringify({ cachePath, saveKey, restoreKeys, restoredKey })}`
-      );
-      core.saveState(`${cacheStateId}-restored-key`, restoredKey);
+      const restoredKey = await cache.restoreCache([cachePath], saveKey, restoreKeys.split('/n'));
+      core.saveState(stateId, restoredKey);
       return restoredKey;
     },
     save: () => cache.saveCache([cachePath], saveKey),
@@ -51,27 +41,17 @@ const cacheConfig = async (
 
 const nixStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-nix-store-`;
 
-const logAndHash = async (pattern: string) => {
-  const globber = await glob.create(pattern);
-  const files = [];
-  for await (const file of globber.globGenerator()) {
-    files.push(file);
-  }
-  const hash = await glob.hashFiles(pattern, undefined, true);
-  core.info(`hashing files: ${files} => ${hash}`);
-  return hash;
-};
-
 export const getNixCache = () =>
   cacheConfig(
     '/tmp/nixcache',
     'nix-store-cache-key',
     async () => {
-      const hash = await logAndHash('flake.nix\nflake.lock');
+      const hash = await glob.hashFiles('flake.nix\nflake.lock', undefined, true);
       return `${nixStoreCacheKeyPrefix}${hash}`;
     },
     'nix-store-cache-restore-keys',
-    [nixStoreCacheKeyPrefix]
+    async () => nixStoreCacheKeyPrefix,
+    'nix-cache-state'
   );
 
 const pnpmStoreCacheKeyPrefix = `${process.env['RUNNER_OS']}-pnpm-store-`;
@@ -81,11 +61,12 @@ export const getPnpmCache = () =>
     `${process.env['HOME']}/.local/share/pnpm/store/v3`,
     'pnpm-store-cache-key',
     async () => {
-      const hash = await logAndHash('**/pnpm-lock.yaml');
+      const hash = await glob.hashFiles('**/pnpm-lock.yaml', undefined, true);
       return `${pnpmStoreCacheKeyPrefix}${hash}`;
     },
     'pnpm-store-cache-restore-keys',
-    [pnpmStoreCacheKeyPrefix]
+    async () => pnpmStoreCacheKeyPrefix,
+    'nix-cache-state'
   );
 
 const direnvVersion = 'v2.32.1';
