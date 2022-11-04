@@ -131,6 +131,7 @@ const nixCacheCleanup = async () => {
         await NIX_STORE.exportTo(cache_1.nixCache.path);
         await (0, cache_1.saveCache)(cache_1.nixCache);
     }
+    await simpleCleanup(cache_1.experimentalCache);
 };
 const pnpmCacheCleanup = async () => {
     if (await (0, cache_1.shouldSaveCache)(cache_1.pnpmCache)) {
@@ -143,7 +144,6 @@ const cleanup = () => Promise.all([
     pnpmCacheCleanup(),
     simpleCleanup(cache_1.direnvCache),
     simpleCleanup(cache_1.projectCache),
-    simpleCleanup(cache_1.experimentalCache),
 ]);
 exports.cleanup = cleanup;
 //# sourceMappingURL=cleanup.js.map

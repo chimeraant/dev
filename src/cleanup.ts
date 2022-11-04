@@ -22,6 +22,7 @@ const nixCacheCleanup = async () => {
     await NIX_STORE.exportTo(nixCache.path);
     await saveCache(nixCache);
   }
+  await simpleCleanup(experimentalCache);
 };
 
 const pnpmCacheCleanup = async () => {
@@ -37,5 +38,4 @@ export const cleanup = () =>
     pnpmCacheCleanup(),
     simpleCleanup(direnvCache),
     simpleCleanup(projectCache),
-    simpleCleanup(experimentalCache),
   ]);
