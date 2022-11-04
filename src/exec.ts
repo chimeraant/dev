@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
 export const prettyExec = async (command: string, args?: string[], option?: exec.ExecOptions) => {
-  const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
+  const cmdStr = `${command}${(args ?? [' ']).join(' ')}`;
   const mark = `>>> "${cmdStr}"`;
   console.time(mark);
   const buffers: string[] = [];
@@ -11,11 +11,11 @@ export const prettyExec = async (command: string, args?: string[], option?: exec
     ignoreReturnCode: true,
     listeners: {
       stdline: (s) => {
-        core.info(`${mark} [stdout] ${s}`);
+        core.info(`[${cmdStr}][stdout] ${s}`);
         buffers.push(`[stdout] ${s}`);
       },
       stderr: (s) => {
-        core.info(`${mark} [stderr] ${s}`);
+        core.info(`[${cmdStr}[ [stderr] ${s}`);
         buffers.push(`[stderr] ${s}`);
       },
     },

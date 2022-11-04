@@ -1,4 +1,4 @@
-import { cacheCleanup, direnvCache, nixCache, pnpmCache, projectCache } from './cache';
+import { cacheCleanup, direnvCache, nixCache, pnpmCache } from './cache';
 import { prettyExec } from './exec';
 
 const ultraCleanup = async () => {
@@ -12,5 +12,4 @@ export const cleanup = () =>
     ultraCleanup(),
     cacheCleanup(pnpmCache, { runBeforeSave: () => prettyExec('pnpm', ['store', 'prune']) }),
     cacheCleanup(direnvCache),
-    cacheCleanup(projectCache),
   ]);

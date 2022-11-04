@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.projectCache = exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.cacheCleanup = exports.restoreCache = void 0;
+exports.direnvCache = exports.pnpmCache = exports.nixCache = exports.cacheCleanup = exports.restoreCache = void 0;
 const cache = __importStar(__nccwpck_require__(7675));
 const core = __importStar(__nccwpck_require__(7954));
 const glob = __importStar(__nccwpck_require__(1770));
@@ -71,7 +71,7 @@ exports.cacheCleanup = cacheCleanup;
 exports.nixCache = {
     path: ['/nix/store/', '/nix/var/nix/db/db.sqlite'],
     patterns: ['flake.nix', 'flake.lock'],
-    key: 'ultra',
+    key: 'nix-store',
 };
 exports.pnpmCache = {
     path: ['~/.local/share/pnpm/store/v3'],
@@ -81,11 +81,6 @@ exports.pnpmCache = {
 exports.direnvCache = {
     path: ['/usr/local/bin/direnv'],
     key: 'direnv-v2.32.1',
-};
-exports.projectCache = {
-    path: [`${process.env['GITHUB_WORKSPACE']}/.direnv`],
-    patterns: ['flake.nix', 'flake.lock', '*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
-    key: 'project',
 };
 //# sourceMappingURL=cache.js.map
 
@@ -109,7 +104,6 @@ const cleanup = () => Promise.all([
     ultraCleanup(),
     (0, cache_1.cacheCleanup)(cache_1.pnpmCache, { runBeforeSave: () => (0, exec_1.prettyExec)('pnpm', ['store', 'prune']) }),
     (0, cache_1.cacheCleanup)(cache_1.direnvCache),
-    (0, cache_1.cacheCleanup)(cache_1.projectCache),
 ]);
 exports.cleanup = cleanup;
 //# sourceMappingURL=cleanup.js.map
@@ -149,7 +143,7 @@ exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
-    const cmdStr = `${command} ${args?.join(' ') ?? ''}`;
+    const cmdStr = `${command}${(args ?? [' ']).join(' ')}`;
     const mark = `>>> "${cmdStr}"`;
     console.time(mark);
     const buffers = [];
@@ -158,11 +152,11 @@ const prettyExec = async (command, args, option) => {
         ignoreReturnCode: true,
         listeners: {
             stdline: (s) => {
-                core.info(`${mark} [stdout] ${s}`);
+                core.info(`[${cmdStr}][stdout] ${s}`);
                 buffers.push(`[stdout] ${s}`);
             },
             stderr: (s) => {
-                core.info(`${mark} [stderr] ${s}`);
+                core.info(`[${cmdStr}[ [stderr] ${s}`);
                 buffers.push(`[stderr] ${s}`);
             },
         },
@@ -285,7 +279,7 @@ exports.install = install;
 const setup = async () => {
     // https://github.com/cachix/install-nix-action/blob/11f4ad19be46fd34c005a2864996d8f197fb51c6/install-nix.sh#L84-L85
     core.addPath(`/nix/var/nix/profiles/default/bin`);
-    await Promise.all([(0, exports.install)(), (0, cache_1.restoreCache)(cache_1.projectCache), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
+    await Promise.all([(0, exports.install)(), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
     await (0, exec_1.prettyExec)('direnv', ['allow']);
     const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json']);
     Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));

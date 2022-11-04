@@ -57,7 +57,7 @@ export const cacheCleanup = async (
 export const nixCache: Cache = {
   path: ['/nix/store/', '/nix/var/nix/db/db.sqlite'],
   patterns: ['flake.nix', 'flake.lock'],
-  key: 'ultra',
+  key: 'nix-store',
 };
 
 export const pnpmCache: Cache = {
@@ -69,10 +69,4 @@ export const pnpmCache: Cache = {
 export const direnvCache: Cache = {
   path: ['/usr/local/bin/direnv'],
   key: 'direnv-v2.32.1',
-};
-
-export const projectCache: Cache = {
-  path: [`${process.env['GITHUB_WORKSPACE']}/.direnv`],
-  patterns: ['flake.nix', 'flake.lock', '*/pnpm-lock.yaml', 'pnpm-lock.yaml'],
-  key: 'project',
 };
