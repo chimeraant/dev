@@ -18,14 +18,12 @@ set -euo pipefail
   add_config "trusted-users = root $USER"
   add_config "experimental-features = nix-command flakes"
 
-  add_config "build-users-group ="
   sudo mkdir -p /etc/nix
   sudo chmod 0755 /etc/nix
   sudo cp $workdir/nix.conf /etc/nix/nix.conf
 
   sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
     --no-channel-add \
-    --darwin-use-unencrypted-nix-store-volume \
     --nix-extra-conf-file "$workdir/nix.conf" \
 
   export version="v2.32.1"
