@@ -12,7 +12,10 @@ const install = async () => {
 };
 
 const setupNixDirenv = async () => {
-  const [nixCacheExists] = await Promise.all([restoreCache(nixCache), install()]);
+  const [nixCacheExists] = await Promise.all([
+    restoreCache(nixCache, { downloadConcurrency: 32 }),
+    install(),
+  ]);
 
   if (nixCacheExists) {
     await NIX_STORE.importFrom(nixCache.path);

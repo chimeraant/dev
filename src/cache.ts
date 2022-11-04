@@ -1,4 +1,5 @@
 import * as cache from '@actions/cache';
+import { DownloadOptions } from '@actions/cache/lib/options';
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 
@@ -22,12 +23,12 @@ const hashPatters = async (conf: Cache) =>
 const getSaveKey = async (conf: Cache) =>
   `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
 
-export const restoreCache = async (conf: Cache) => {
+export const restoreCache = async (conf: Cache, opts?: DownloadOptions) => {
   core.info(`>>> Start: restore cache "${conf.key}"`);
   const start = performance.now();
 
   const saveKey = await getSaveKey(conf);
-  const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
+  const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key], opts);
   const result = saveCacheState(conf.key, restoredKey);
 
   const elapsed = ((performance.now() - start) / 1000).toFixed(0);
