@@ -19,14 +19,15 @@ const hashPatters = async (conf: Cache) =>
     ? ''
     : `-${await glob.hashFiles(conf.patterns.join('\n'), undefined, false)}`;
 
-const getSaveKey = async (conf: Cache) =>
-  `${process.env['RUNNER_OS']}-${conf.key}${await hashPatters(conf)}`;
+const restoreKey = ({ key }: Cache) => `${process.env['RUNNER_OS']}-${key}`;
+
+const getSaveKey = async (conf: Cache) => `${restoreKey(conf)}${await hashPatters(conf)}`;
 
 export const restoreCache = async (conf: Cache) => {
   console.time(`>>> restore cache "${conf.key}"`);
 
   const saveKey = await getSaveKey(conf);
-  const restoredKey = await cache.restoreCache([conf.path], saveKey, [conf.key]);
+  const restoredKey = await cache.restoreCache([conf.path], saveKey, [restoreKey(conf)]);
   const result = saveCacheState(conf.key, restoredKey);
 
   console.timeEnd(`>>> restore cache "${conf.key}"`);
