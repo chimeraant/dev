@@ -4,23 +4,16 @@ set -euo pipefail
 
 {
   if type -p nix &>/dev/null ; then
-    echo "Aborting: Nix is already installed at $(type -p nix)"
-    exit
+    echo "nix is already installed at $(type -p nix). Skipping installation."
+  else
+    workdir=$(mktemp -d)
+    trap 'rm -rf "$workdir"' EXIT
+
+    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf" >/dev/null
+    sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
+      --no-channel-add \
+      --nix-extra-conf-file "$workdir/nix.conf" \
   fi
-
-  workdir=$(mktemp -d)
-  trap 'rm -rf "$workdir"' EXIT
-
-  add_config() {
-    echo "$1" | tee -a "$workdir/nix.conf" >/dev/null
-  }
-  add_config "max-jobs = auto"
-  add_config "trusted-users = $USER"
-  add_config "experimental-features = nix-command flakes"
-
-  sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
-    --no-channel-add \
-    --nix-extra-conf-file "$workdir/nix.conf" \
 
   export version="v2.32.1"
   if $(type -p direnv &>/dev/null) && [[ "v$(direnv --version)" == "$version" ]] ; then
