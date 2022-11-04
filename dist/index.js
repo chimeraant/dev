@@ -272,10 +272,7 @@ const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
     await (0, exec_1.prettyExec)('sudo', ['mkdir', '-p', '--verbose', '/nix']);
     await (0, exec_1.prettyExec)('sudo', ['chown', '--verbose', `${process.env['USER']}:`, '/nix']);
-    await Promise.all([
-        (0, cache_1.restoreCache)(cache_1.nixCache, { downloadConcurrency: 16 }),
-        (0, cache_1.restoreCache)(cache_1.direnvCache),
-    ]);
+    await Promise.all([(0, cache_1.restoreCache)(cache_1.nixCache), (0, cache_1.restoreCache)(cache_1.direnvCache)]);
     await (0, exec_1.prettyExec)(__nccwpck_require__.ab + "install.sh");
 };
 const setup = async () => {
