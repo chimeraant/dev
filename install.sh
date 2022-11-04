@@ -8,11 +8,16 @@ set -euo pipefail
   if $(type -p nix &>/dev/null) && [[ $(nix --version) == "nix (Nix) $nix_version" ]] ; then
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
-    sudo mkdir -p /etc/nix
-    sudo chmod 0755 /etc/nix
-    sudo sh -c 'printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> /etc/nix/nix.conf'
+    # Create a temporary workdir
+    workdir=$(mktemp -d)
+    trap 'rm -rf "$workdir"' EXIT
+    printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
+    sh <(curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") --help
     sh <(curl -o /tmp/nix/install -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
-      --no-channel-add --nix-extra-conf-file /etc/nix/nix.conf
+      --no-channel-add \
+      --daemon \
+      --daemon-user-count "$(python3 -c 'import multiprocessing as mp; print(mp.cpu_count() * 2)')" \
+      --nix-extra-conf-file "$workdir/nix.conf"
   fi
 
   export version="v2.32.1"
