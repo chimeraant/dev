@@ -7,7 +7,8 @@ export const prettyExec = async (command: string, args?: string[], option?: exec
     silent: true,
     ...option,
   });
-  const elapsed = (performance.now() - start).toFixed(0);
+  const end = performance.now();
+  const elapsed = ((end - start) / 1000).toFixed(0);
   const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
   const cmdStr = `${command} ${args?.join(' ')}`;
   core.info(`\n\n>>> "${cmdStr}" (${elapsed}s) ${code}`);
