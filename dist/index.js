@@ -229,6 +229,8 @@ exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const prettyExec = async (command, args, option) => {
+    const cmdStr = `${command} ${args?.join(' ')}`;
+    core.info(`\n\n>>> Start: "${cmdStr}"`);
     const start = performance.now();
     const output = await exec.getExecOutput(command, args, {
         silent: true,
@@ -237,8 +239,7 @@ const prettyExec = async (command, args, option) => {
     const end = performance.now();
     const elapsed = ((end - start) / 1000).toFixed(0);
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
-    const cmdStr = `${command} ${args?.join(' ')}`;
-    core.info(`\n\n>>> "${cmdStr}" (${elapsed}s) ${code}`);
+    core.info(`\n\n>>> Done: "${cmdStr}" (${elapsed}s) ${code}`);
     core.startGroup(`stderr`);
     core.info(output.stderr);
     core.endGroup();
