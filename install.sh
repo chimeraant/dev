@@ -10,6 +10,9 @@ set -euo pipefail
     workdir=$(mktemp -d)
     trap 'rm -rf "$workdir"' EXIT
     printf "max-jobs = auto\ntrusted-users = $USER\nexperimental-features = nix-command flakes" >> "$workdir/nix.conf"
+    sudo mkdir -p /etc/nix
+    sudo chmod 0755 /etc/nix
+    sudo cp $workdir/nix.conf /etc/nix/nix.conf
     sh <(curl -sfL "https://releases.nixos.org/nix/nix-2.11.0/install") \
       --no-channel-add \
       --nix-extra-conf-file "$workdir/nix.conf"
