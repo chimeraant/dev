@@ -51,6 +51,17 @@ const setupNixCache = async () => {
     const restoredCacheKey = await nixCache.restore();
     return [nixCache, restoredCacheKey];
 };
+const exportEnvrc = async () => {
+    let outputBuffer = '';
+    await exec.exec('direnv', ['export', 'json'], {
+        listeners: {
+            stdout: (data) => {
+                outputBuffer += data.toString();
+            },
+        },
+    });
+    Object.entries(JSON.parse(outputBuffer)).forEach(([key, value]) => core.exportVariable(key, value));
+};
 const setupNixDirenv = async () => {
     const [[nixCache, restoredCacheKey]] = await Promise.all([setupNixCache(), cacheAndInstall()]);
     if (restoredCacheKey !== undefined) {
@@ -63,7 +74,7 @@ const setupNixDirenv = async () => {
         ]);
     }
     await exec.exec('direnv', ['allow']);
-    await (0, util_1.execScript)('direnv-setup.sh');
+    await exportEnvrc();
 };
 const pnpmRestore = async () => {
     const pnpmCache = await (0, util_1.getPnpmCache)();
