@@ -80,7 +80,7 @@ exports.nixCache = {
 };
 exports.pnpmCache = {
     path: `~/.local/share/pnpm/store/v3`,
-    patterns: ['**/pnpm-lock.yaml', '!.direnv/**'],
+    patterns: ['**/pnpm-lock.yaml', '!.direnv/**', '**/!node_modules/**'],
     key: 'pnpm-store',
 };
 exports.direnvCache = {
@@ -89,7 +89,7 @@ exports.direnvCache = {
 };
 exports.projectCache = {
     path: `${process.env['GITHUB_WORKSPACE']}/.direnv`,
-    patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**'],
+    patterns: ['flake.nix', 'flake.lock', '**/pnpm-lock.yaml', '!.direnv/**', '**/!node_modules/**'],
     key: 'project',
 };
 exports.nixInstallerCache = {
