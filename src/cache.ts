@@ -8,7 +8,6 @@ const saveCacheState = (stateId: string, restoredKey: string | undefined) => {
   return isCacheExists;
 };
 
-// cache with input
 export type Cache = {
   path: string;
   patterns?: string[];
