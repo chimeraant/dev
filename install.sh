@@ -27,7 +27,7 @@ set -euo pipefail
     curl -sfL https://raw.githubusercontent.com/direnv/direnv/db00133c845be3a01437b933936db5aa40977d30/install.sh | sudo --preserve-env bash
   fi
 
-  line='eval "\$(direnv hook bash)"'
+  line='eval "$(direnv hook bash)"'
   file="$HOME/.bashrc"
   grep -qF -- "$line" "$file" || echo "$line" >> "$file"
   source "$file"
