@@ -4,7 +4,9 @@ import * as exec from '@actions/exec';
 import { timeDone, timeStart } from './time';
 
 export const prettyExec = async (command: string, args?: string[], opts?: exec.ExecOptions) => {
-  const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
+  const optsStr = opts !== undefined ? ` ${JSON.stringify(opts)}` : '';
+  const argsStr = ['', ...(args ?? [])].join(' ');
+  const cmdStr = `${command}${argsStr}${optsStr}`;
   timeStart(cmdStr);
   const buffers: string[] = [];
   const output = await exec.getExecOutput(command, args, {

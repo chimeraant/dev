@@ -155,7 +155,9 @@ const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const time_1 = __nccwpck_require__(873);
 const prettyExec = async (command, args, opts) => {
-    const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
+    const optsStr = opts !== undefined ? ` ${JSON.stringify(opts)}` : '';
+    const argsStr = ['', ...(args ?? [])].join(' ');
+    const cmdStr = `${command}${argsStr}${optsStr}`;
     (0, time_1.timeStart)(cmdStr);
     const buffers = [];
     const output = await exec.getExecOutput(command, args, {
