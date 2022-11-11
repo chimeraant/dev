@@ -1,4 +1,6 @@
 import * as core from '@actions/core';
+import * as glob from '@actions/glob';
+import * as path from 'path';
 
 import { direnvCache, nixCache, pnpmCache, restoreCache } from './cache';
 import { prettyExec } from './exec';
@@ -16,7 +18,13 @@ export const setup = async () => {
   core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/profile/bin`);
   core.addPath(`/run/current-system/sw/bin`);
   await Promise.all([restoreNixCache(), restoreCache(pnpmCache)]);
-  await prettyExec('direnv', ['allow']);
-  const { stdout } = await prettyExec('direnv', ['export', 'json']);
-  Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
+
+  const globber = await glob.create('**/.envrc');
+  const files = await globber.glob();
+  for (const file of files) {
+    const cwd = path.dirname(file);
+    await prettyExec('direnv', ['allow'], { cwd });
+    const { stdout } = await prettyExec('direnv', ['export', 'json'], { cwd });
+    Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
+  }
 };

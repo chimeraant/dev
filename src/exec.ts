@@ -3,7 +3,7 @@ import * as exec from '@actions/exec';
 
 import { timeDone, timeStart } from './time';
 
-export const prettyExec = async (command: string, args?: string[]) => {
+export const prettyExec = async (command: string, args?: string[], opts?: exec.ExecOptions) => {
   const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
   timeStart(cmdStr);
   const buffers: string[] = [];
@@ -18,6 +18,7 @@ export const prettyExec = async (command: string, args?: string[]) => {
         buffers.push(`${cmdStr} > stderr > ${s}`);
       },
     },
+    ...opts,
   });
   const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
   timeDone(cmdStr);

@@ -154,7 +154,7 @@ exports.prettyExec = void 0;
 const core = __importStar(__nccwpck_require__(7954));
 const exec = __importStar(__nccwpck_require__(5082));
 const time_1 = __nccwpck_require__(873);
-const prettyExec = async (command, args) => {
+const prettyExec = async (command, args, opts) => {
     const cmdStr = `${command}${['', ...(args ?? [])].join(' ')}`;
     (0, time_1.timeStart)(cmdStr);
     const buffers = [];
@@ -169,6 +169,7 @@ const prettyExec = async (command, args) => {
                 buffers.push(`${cmdStr} > stderr > ${s}`);
             },
         },
+        ...opts,
     });
     const code = output.exitCode === 0 ? '' : ` exit code: ${output.exitCode}`;
     (0, time_1.timeDone)(cmdStr);
@@ -267,6 +268,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setup = void 0;
 const core = __importStar(__nccwpck_require__(7954));
+const glob = __importStar(__nccwpck_require__(1770));
+const path = __importStar(__nccwpck_require__(1017));
 const cache_1 = __nccwpck_require__(6175);
 const exec_1 = __nccwpck_require__(9390);
 const restoreNixCache = async () => {
@@ -281,9 +284,14 @@ const setup = async () => {
     core.addPath(`/nix/var/nix/profiles/per-user/${process.env['USER']}/profile/bin`);
     core.addPath(`/run/current-system/sw/bin`);
     await Promise.all([restoreNixCache(), (0, cache_1.restoreCache)(cache_1.pnpmCache)]);
-    await (0, exec_1.prettyExec)('direnv', ['allow']);
-    const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json']);
-    Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
+    const globber = await glob.create('**/.envrc');
+    const files = await globber.glob();
+    for (const file of files) {
+        const cwd = path.dirname(file);
+        await (0, exec_1.prettyExec)('direnv', ['allow'], { cwd });
+        const { stdout } = await (0, exec_1.prettyExec)('direnv', ['export', 'json'], { cwd });
+        Object.entries(JSON.parse(stdout)).forEach(([key, value]) => core.exportVariable(key, value));
+    }
 };
 exports.setup = setup;
 //# sourceMappingURL=setup.js.map
