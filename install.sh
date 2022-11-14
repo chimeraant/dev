@@ -9,15 +9,12 @@ set -euo pipefail
     echo "nix $nix_version is already installed at $(type -p nix). Skipping installation."
   else
     sudo rm -rf /nix
-    nix_conf_file=$(mktemp)
-    trap 'rm "$nix_conf_file"' EXIT
-    nix_conf="max-jobs = auto\nexperimental-features = nix-command flakes" 
-    printf "nix_conf='$nix_conf'"
-    printf "$nix_conf" >> "$nix_conf_file"
+    trap 'rm /tmp/nix.conf' EXIT
+    printf "max-jobs = auto\nexperimental-features = nix-command flakes" >> /tmp/nix.conf
     sh <(curl -sfL "https://releases.nixos.org/nix/nix-$nix_version/install") \
       --no-channel-add \
       --no-daemon \
-      --nix-extra-conf-file "$nix_conf_file"
+      --nix-extra-conf-file /tmp/nix.conf
   fi
 
   export version="v2.32.1"
