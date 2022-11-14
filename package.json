@@ -4,7 +4,7 @@
   "description": "Chimera Ant's development environment",
   "main": "lib/main.js",
   "scripts": {
-    "build:ci": "tsc && ncc build --source-map --license licenses.txt",
+    "build:ci": "rm -rf dist && tsc && ncc build --source-map --license licenses.txt",
     "build": "NODE_OPTIONS=--openssl-legacy-provider pnpm build:ci",
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
